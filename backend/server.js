@@ -2,113 +2,34 @@ const express = require("express");
 const app = express();
 const PORT = 3000;
 
-const customerRoutes = require("./router/customers.js");
-app.use("/customers", customerRoutes);
-
-
-const purchaseRoutes = require("./router/purchases.js");
-app.use("/purchases", purchaseRoutes);
-
-const saleRoutes = require("./router/sale.js");
-app.use("/sales", saleRoutes);
-
-const invoiceRoutes = require("./router/invoices.js");
-app.use("/invoices", invoiceRoutes);
-
-const transactionRoutes = require("./router/transactions.js");
-app.use("/transactions", transactionRoutes);
-
-const productRoutes = require("./router/products.js");
-app.use("/products", productRoutes);
-
-
-
-const vendorRoutes = require("./router/vendors.js");
-app.use("/vendors", vendorRoutes);
-app.listen(3000, () => {
-    console.log("Server running on port 3000 ");
-});
-
 app.use(express.json());
 
+
+const customerRouter = require("./router/customers.js");
+app.use("/customers", customerRouter);
+
+const purchaseRouter = require("./router/purchases.js");
+app.use("/purchases", purchaseRouter);
+
+const saleRouter = require("./router/sale.js");
+app.use("/sales", saleRouter);
+
+const invoiceRouter = require("./router/invoice.js");
+app.use("/invoices", invoiceRouter);
+
+const transactionRouter = require("./router/transaction.js");
+app.use("/transactions", transactionRouter);
+
+const productRouter = require("./router/product.js");
+app.use("/products", productRouter);
+
+const vendorRouter = require("./router/vendors.js");
+app.use("/vendors", vendorRouter);
+
 const db = require("./setup.js");
-console.log("DB type:", typeof db);
-console.log("Prepare type:", typeof db.prepare);
 
 app.get("/", (req, res) => {
     res.send("Server is running");
-});
-
-app.post("/products", (req, res) => {
-    try {
-        const { name, description, price, stock, vendor_id } = req.body;
-
-        if (!name || name.trim() === "") {
-            return res.status(400).json({ error: "Product name is required" });
-        }
-        if (price === undefined || price === null) {
-            return res.status(400).json({ error: "Price is required" });
-        }
-
-        db.prepare(`
-            INSERT INTO products (name, description, price, stock, vendor_id)
-            VALUES (?, ?, ?, ?, ?)
-        `).run(name.trim(), description || null, price, stock || 0, vendor_id || null);
-
-        res.status(201).json({ message: "Product added successfully" });
-
-    } catch (err) {
-        res.status(500).json({ error: "Failed to add product", details: err.message });
-    }
-});
-
-app.get("/products", (req, res) => {
-    try {
-        const data = db.prepare("SELECT * FROM products").all();
-        res.status(200).json(data);
-
-    } catch (err) {
-        res.status(500).json({ error: "Failed to fetch products", details: err.message });
-    }
-});
-
-app.put("/products/:id", (req, res) => {
-    try {
-        const { id } = req.params;
-        const { name } = req.body;
-
-        if (!name || name.trim() === "") {
-            return res.status(400).json({ error: "Product name is required" });
-        }
-
-        const result = db.prepare("UPDATE products SET name=? WHERE id=?").run(name.trim(), id);
-
-        if (result.changes === 0) {
-            return res.status(404).json({ error: `Product with id ${id} not found` });
-        }
-
-        res.status(200).json({ message: "Product updated successfully" });
-
-    } catch (err) {
-        res.status(500).json({ error: "Failed to update product", details: err.message });
-    }
-});
-
-app.delete("/products/:id", (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const result = db.prepare("DELETE FROM products WHERE id=?").run(id);
-
-        if (result.changes === 0) {
-            return res.status(404).json({ error: `Product with id ${id} not found` });
-        }
-
-        res.status(200).json({ message: "Product deleted successfully" });
-
-    } catch (err) {
-        res.status(500).json({ error: "Failed to delete product", details: err.message });
-    }
 });
 
 app.use((req, res) => {
