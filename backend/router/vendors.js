@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require("../setup");
 
 
-// ✅ CREATE Vendor
+//  CREATE Vendor
 router.post("/", (req, res) => {
     const { name, contact } = req.body;
 
@@ -14,14 +14,14 @@ router.post("/", (req, res) => {
 });
 
 
-// ✅ READ All Vendors
+//  READ All Vendors
 router.get("/", (req, res) => {
     const data = db.prepare("SELECT * FROM vendors").all();
     res.json(data);
 });
 
 
-// ✅ READ Single Vendor
+// READ Single Vendor
 router.get("/:id", (req, res) => {
     const { id } = req.params;
 
@@ -32,7 +32,7 @@ router.get("/:id", (req, res) => {
 });
 
 
-// ✅ UPDATE Vendor
+//  UPDATE Vendor
 router.put("/:id", (req, res) => {
     const { id } = req.params;
     const { name, contact } = req.body;
@@ -44,7 +44,7 @@ router.put("/:id", (req, res) => {
 });
 
 
-// ✅ DELETE Vendor
+//  DELETE Vendor
 router.delete("/:id", (req, res) => {
     const { id } = req.params;
 

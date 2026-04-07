@@ -1,9 +1,33 @@
 const express = require("express");
 const app = express();
 const PORT = 3000;
-const vendorRoutes = requir("./routes/vendor");
 
+const customerRoutes = require("./router/customers.js");
+app.use("/customers", customerRoutes);
+
+
+const purchaseRoutes = require("./router/purchases.js");
+app.use("/purchases", purchaseRoutes);
+
+const saleRoutes = require("./router/sale.js");
+app.use("/sales", saleRoutes);
+
+const invoiceRoutes = require("./router/invoices.js");
+app.use("/invoices", invoiceRoutes);
+
+const transactionRoutes = require("./router/transactions.js");
+app.use("/transactions", transactionRoutes);
+
+const productRoutes = require("./router/products.js");
+app.use("/products", productRoutes);
+
+
+
+const vendorRoutes = require("./router/vendors.js");
 app.use("/vendors", vendorRoutes);
+app.listen(3000, () => {
+    console.log("Server running on port 3000 ");
+});
 
 app.use(express.json());
 
