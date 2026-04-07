@@ -1,4 +1,6 @@
+db.exec("PRAGMA foreign_keys = ON");
 const Database = require('better-sqlite3');
+
 const db = new Database('inventory.sqlite');
 
 console.log('✅ Database connected!');
