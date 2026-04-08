@@ -26,6 +26,9 @@ app.use("/products", productRouter);
 const vendorRouter = require("./router/vendors.js");
 app.use("/vendors", vendorRouter);
 
+const authRouter = require("./router/authRoutes.js");
+app.use("/auth", authRouter);
+
 const db = require("./setup.js");
 
 app.get("/", (req, res) => {

@@ -1,9 +1,10 @@
-db.exec("PRAGMA foreign_keys = ON");
 const Database = require('better-sqlite3');
 
 const db = new Database('inventory.sqlite');
 
 console.log('✅ Database connected!');
+
+db.exec("PRAGMA foreign_keys = ON");
 
 // 1. VENDORS TABLE
 db.exec(`
@@ -103,6 +104,17 @@ db.exec(`
   )
 `);
 console.log('✅ Transactions table ');
+
+// 8. user table
+db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    email TEXT UNIQUE,
+    password TEXT
+  )
+`);
+console.log("✅ Users table ready");
 
 module.exports = db;
 console.log('');

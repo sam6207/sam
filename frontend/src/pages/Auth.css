@@ -1,0 +1,106 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; }
+
+/* Popup */
+.popup-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding-top: 2rem; z-index: 999; pointer-events: none;
+}
+.popup-box {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 20px; border-radius: 10px;
+  min-width: 280px; max-width: 380px;
+  animation: popIn 0.25s ease; pointer-events: all;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+}
+.popup-box.error  { background: #fff5f5; border: 1.5px solid #fc8181; color: #c53030; }
+.popup-box.success { background: #f0fff4; border: 1.5px solid #68d391; color: #276749; }
+.popup-icon {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px; flex-shrink: 0;
+}
+.popup-box.error   .popup-icon { background: #fed7d7; color: #c53030; }
+.popup-box.success .popup-icon { background: #c6f6d5; color: #276749; }
+.popup-box p { font-size: 14px; line-height: 1.4; }
+
+@keyframes popIn {
+  from { transform: translateY(-12px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+
+/* Page layout */
+.auth-wrap {
+  min-height: 100vh; display: flex;
+  align-items: center; justify-content: center;
+  padding: 2rem; background: #f0f4f8;
+}
+
+/* Card */
+.auth-card {
+  background: #fff; border: 1px solid #e2e8f0;
+  border-radius: 14px; padding: 2.25rem 2.5rem;
+  width: 100%; max-width: 400px;
+}
+
+/* Brand */
+.brand { text-align: center; margin-bottom: 1.75rem; }
+.brand-logo {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 52px; height: 52px; background: #0C447C; color: #B5D4F4;
+  border-radius: 12px; font-size: 16px; font-weight: 700;
+  letter-spacing: 1px; margin-bottom: 10px;
+}
+.brand p { font-size: 13px; color: #718096; }
+
+/* Form title */
+.form-title { font-size: 18px; font-weight: 600; color: #1a202c; margin-bottom: 1.25rem; }
+
+/* Fields */
+.field { margin-bottom: 1.1rem; }
+.field label { display: block; font-size: 13px; font-weight: 500; color: #4a5568; margin-bottom: 6px; }
+.field input {
+  width: 100%; padding: 10px 13px;
+  border: 1.5px solid #cbd5e0; border-radius: 8px;
+  font-size: 14px; color: #1a202c; outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.field input:focus {
+  border-color: #185FA5;
+  box-shadow: 0 0 0 3px rgba(24,95,165,0.15);
+}
+
+/* Password strength bars */
+.pass-strength { display: flex; gap: 5px; margin-top: 8px; }
+.bar { flex: 1; height: 4px; border-radius: 999px; background: #e2e8f0; transition: background 0.2s; }
+.bar.weak   { background: #fc8181; }
+.bar.medium { background: #f6ad55; }
+.bar.strong { background: #68d391; }
+
+/* Buttons */
+.btn-primary {
+  width: 100%; padding: 11px;
+  background: #0C447C; color: #E6F1FB;
+  border: none; border-radius: 8px;
+  font-size: 15px; font-weight: 600;
+  cursor: pointer; margin-top: 6px;
+  transition: background 0.15s;
+}
+.btn-primary:hover { background: #185FA5; }
+
+.btn-secondary {
+  width: 100%; padding: 10px;
+  background: transparent; color: #185FA5;
+  border: 1.5px solid #bee3f8; border-radius: 8px;
+  font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: background 0.15s;
+}
+.btn-secondary:hover { background: #EBF8FF; }
+
+/* Divider */
+.divider {
+  display: flex; align-items: center; gap: 10px;
+  margin: 1.25rem 0 1rem; color: #a0aec0; font-size: 12px;
+}
+.divider::before, .divider::after { content: ""; flex: 1; border-top: 1px solid #e2e8f0; }
