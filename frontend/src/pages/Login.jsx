@@ -60,8 +60,8 @@ export default function Login() {
 
       <div className="auth-card">
         <div className="brand">
-          <div className="brand-logo">SAM</div>
-          <p>Sales & Account Manager</p>
+          <div className="brand-logo">SSM</div>
+          <p>ShoeShop Manager</p>
         </div>
 
         <h2 className="form-title">Login to your account</h2>
