@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-
+import InvertoryApp from "./inventory/InventoryApp";
 export default function App() {
   return (
     <BrowserRouter>
@@ -9,16 +9,7 @@ export default function App() {
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route
-          path="/dashboard"
-          element={
-            localStorage.getItem("token") ? (
-              <h1 style={{ padding: "2rem" }}>Dashboard — Coming Soon</h1>
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
+        <Route path="/dashboard" element={<InvertoryApp />} />
       </Routes>
     </BrowserRouter>
   );
