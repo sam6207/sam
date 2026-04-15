@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+  import { useState, useMemo } from "react";
 
 const INIT_STATE = {
   products: [],
@@ -20,7 +20,7 @@ function reducer(state, action) {
     case "ADD_PRODUCT":
       return { ...state, products: [...state.products, action.data] };
 
-    case "UPDATE_PRODUCT":
+   case "UPDATE_PRODUCT":
       return {
         ...state,
         products: state.products.map((p) =>
@@ -130,7 +130,7 @@ export default function App() {
   const dispatch = (action) => setDb((prev) => reducer(prev, action));
 
   const [page, setPage] = useState("dashboard");
-  const [ setSelectedInvoiceNo] = useState(null);
+  const [  setSelectedInvoiceNo] = useState(null);
 
   const goToInvoice = (invoiceNo) => {
     setSelectedInvoiceNo(invoiceNo);
