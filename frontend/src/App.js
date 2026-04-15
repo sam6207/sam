@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import InvertoryApp from "./inventory/InventoryApp";
-import "./app.css";
+import "./inventory/App.css";
 
 export default function App() {
   return (
@@ -12,6 +12,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<InvertoryApp />} />
+        <Route path ="/css" element={<div>CSS</div>} />
       </Routes>
     </BrowserRouter>
   );
