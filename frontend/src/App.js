@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import InvertoryApp from "./inventory/InventoryApp";
+import "./app.css";
+
 export default function App() {
   return (
     <BrowserRouter>

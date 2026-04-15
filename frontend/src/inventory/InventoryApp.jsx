@@ -1,63 +1,27 @@
   import { useState, useMemo } from "react";
 
 const INIT_STATE = {
-  products: [],
-  purchases: [],
+  products: [
+    { id: 1, name: "Nike Shoe", price: 2000, stock: 10 },
+    { id: 2, name: "Adidas Shoe", price: 1800, stock: 8 },
+    { id: 3, name: "Puma Shoe", price: 1500, stock: 5 },
+  ],
+  customers: [
+    { id: 1, name: "Rahul", totalBuy: 5000 },
+    { id: 2, name: "Aman", totalBuy: 3000 },
+  ],
   sales: [],
+  purchases: [],
 };
 
-let _seq = 1;
+let _seq = 100;
 const uid = () => _seq++;
 const fmt = (n) => "₹" + Number(n || 0).toLocaleString("en-IN");
 const todayStr = () => new Date().toISOString().split("T")[0];
 const padInv = (n) => `INV-${String(n).padStart(3, "0")}`;
 
-function reducer(state, action) {
-  switch (action.type) {
-    case "ADD_PRODUCT":
-      return { ...state, products: [...state.products, action.data] };
-
-    case "STOCK_IN":
-      return {
-        ...state,
-        products: state.products.map((p) =>
-          p.id === action.productId
-            ? { ...p, stock: p.stock + action.qty }
-            : p
-        ),
-      };
-
-    case "STOCK_OUT":
-      return {
-        ...state,
-        products: state.products.map((p) =>
-          p.id === action.productId
-            ? { ...p, stock: p.stock - action.qty }
-            : p
-        ),
-      };
-
-    case "ADD_PURCHASE":
-      return {
-        ...state,
-        purchases: [...state.purchases, { ...action.data, id: uid() }],
-      };
-
-    case "ADD_SALE":
-      return {
-        ...state,
-        sales: [...state.sales, { ...action.data, id: uid() }],
-      };
-
-    default:
-      return state;
-  }
-}
-
 export default function App() {
   const [db, setDb] = useState(INIT_STATE);
-  const dispatch = (action) => setDb((prev) => reducer(prev, action));
-
   const [page, setPage] = useState("dashboard");
 
   const stats = useMemo(() => {
@@ -66,15 +30,51 @@ export default function App() {
     return { totalRevenue, totalCost };
   }, [db]);
 
+  const addSale = () => {
+    const invoiceNo = padInv(db.sales.length + 1);
+
+    db.products.slice(0, 2).forEach((p) => {
+      if (p.stock <= 0) return;
+
+      setDb((prev) => ({
+        ...prev,
+        sales: [
+          ...prev.sales,
+          {
+            id: uid(),
+            invoiceNo,
+            productName: p.name,
+            total: p.price,
+            date: todayStr(),
+          },
+        ],
+        products: prev.products.map((x) =>
+          x.id === p.id ? { ...x, stock: x.stock - 1 } : x
+        ),
+      }));
+    });
+  };
+
   return (
     <div style={{ padding: 20 }}>
       <h1>Shoe Shop Manager</h1>
 
+      {/* MENU */}
       <div style={{ marginBottom: 20 }}>
-        <button onClick={() => setPage("dashboard")}>Dashboard</button>
-        <button onClick={() => setPage("products")}>Products</button>
-        <button onClick={() => setPage("purchase")}>Purchase</button>
-        <button onClick={() => setPage("sales")}>Sales</button>
+        {[
+          "dashboard",
+          "inventory",
+          "invoice",
+          "analytics",
+          "stock",
+          "customer",
+          "help",
+          "settings",
+        ].map((p) => (
+          <button key={p} onClick={() => setPage(p)}>
+            {p}
+          </button>
+        ))}
       </div>
 
       {/* DASHBOARD */}
@@ -86,128 +86,82 @@ export default function App() {
         </div>
       )}
 
-      {/* PRODUCTS (ADMIN ADD - LIMIT 10) */}
-      {page === "products" && (
+      {/* INVENTORY */}
+      {page === "inventory" && (
         <div>
-          <h2>Products (Admin)</h2>
-
-          <button
-            onClick={() => {
-              if (db.products.length >= 10) {
-                alert("Only 10 products allowed");
-                return;
-              }
-
-              dispatch({
-                type: "ADD_PRODUCT",
-                data: {
-                  id: uid(),
-                  name: "Shoe " + (db.products.length + 1),
-                  price: 1000 + db.products.length * 100,
-                  stock: 10,
-                },
-              });
-            }}
-          >
-            Add Product
-          </button>
-
-          <ul>
-            {db.products.map((p) => (
-              <li key={p.id}>
-                {p.name} - {fmt(p.price)} (Stock: {p.stock})
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* PURCHASE PAGE (SHOW PRODUCT LIST) */}
-      {page === "purchase" && (
-        <div>
-          <h2>Purchase</h2>
-
+          <h2>Inventory</h2>
           {db.products.map((p) => (
-            <div key={p.id} style={{ marginBottom: 10 }}>
-              {p.name} - {fmt(p.price)}
-
-              <button
-                onClick={() => {
-                  dispatch({
-                    type: "ADD_PURCHASE",
-                    data: {
-                      productName: p.name,
-                      productId: p.id,
-                      qty: 5,
-                      price: p.price,
-                      total: p.price * 5,
-                      date: todayStr(),
-                    },
-                  });
-
-                  dispatch({
-                    type: "STOCK_IN",
-                    productId: p.id,
-                    qty: 5,
-                  });
-                }}
-              >
-                Buy
-              </button>
-            </div>
+            <p key={p.id}>
+              {p.name} - {fmt(p.price)} (Stock: {p.stock})
+            </p>
           ))}
         </div>
       )}
 
-      {/* SALES PAGE (SHOW 5 PRODUCTS SALE) */}
-      {page === "sales" && (
+      {/* INVOICE */}
+      {page === "invoice" && (
         <div>
-          <h2>Sales</h2>
+          <h2>Invoice</h2>
+          <button onClick={addSale}>Generate Invoice</button>
 
-          <button
-            onClick={() => {
-              if (db.products.length < 5) {
-                alert("At least 5 products required");
-                return;
-              }
+          {db.sales.map((s) => (
+            <p key={s.id}>
+              {s.invoiceNo} - {s.productName} - {fmt(s.total)}
+            </p>
+          ))}
+        </div>
+      )}
 
-              const invoiceNo = padInv(db.sales.length + 1);
+      {/* ANALYTICS */}
+      {page === "analytics" && (
+        <div>
+          <h2>Analytics</h2>
+          <p>Total Sales: {db.sales.length}</p>
+          <p>Products Count: {db.products.length}</p>
+          <p>Customers: {db.customers.length}</p>
+        </div>
+      )}
 
-              // First 5 products sale
-              db.products.slice(0, 5).forEach((product) => {
-                if (product.stock <= 0) return;
+      {/* STOCK */}
+      {page === "stock" && (
+        <div>
+          <h2>Stock</h2>
+          {db.products.map((p) => (
+            <p key={p.id}>
+              {p.name}: {p.stock} left
+            </p>
+          ))}
+        </div>
+      )}
 
-                dispatch({
-                  type: "ADD_SALE",
-                  data: {
-                    invoiceNo,
-                    productName: product.name,
-                    productId: product.id,
-                    qty: 1,
-                    price: product.price,
-                    total: product.price,
-                    date: todayStr(),
-                  },
-                });
+      {/* CUSTOMER */}
+      {page === "customer" && (
+        <div>
+          <h2>Customers</h2>
+          {db.customers.map((c) => (
+            <p key={c.id}>
+              {c.name} - Total Buy: {fmt(c.totalBuy)}
+            </p>
+          ))}
+        </div>
+      )}
 
-                dispatch({
-                  type: "STOCK_OUT",
-                  productId: product.id,
-                  qty: 1,
-                });
-              });
-            }}
-          >
-            Sell 5 Products
-          </button>
+      {/* HELP */}
+      {page === "help" && (
+        <div>
+          <h2>Help</h2>
+          <p>1. Add products in inventory</p>
+          <p>2. Purchase to increase stock</p>
+          <p>3. Sales to generate invoice</p>
+        </div>
+      )}
 
-          <ul>
-            {db.sales.map((s) => (
-              <li key={s.id}>
-                {s.invoiceNo} - {s.productName} - {fmt(s.total)}
-              </li>
-            ))}
-          </ul>
+      {/* SETTINGS */}
+      {page === "settings" && (
+        <div>
+          <h2>Settings</h2>
+          <p>Shop Name: Shoe Shop Manager</p>
+          <p>Currency: INR (₹)</p>
         </div>
       )}
     </div>
