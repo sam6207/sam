@@ -9,6 +9,8 @@ export default function App() {
   const [categories, setCategories] = useState(["Tech", "Fashion"]);
   const [purchases, setPurchases] = useState([]);
   const [customers, setCustomers] = useState([]);
+  const [vendors, setVendors] = useState([]);
+  const [users, setUsers] = useState([]);
 
   // INPUT STATES
   const [productName, setProductName] = useState("");
@@ -17,10 +19,20 @@ export default function App() {
   const [purchaseItem, setPurchaseItem] = useState("");
   const [purchaseQty, setPurchaseQty] = useState("");
   const [customerName, setCustomerName] = useState("");
+  const [vendorsName, setVendorsName] = useState("");
+  const [usersName, setUsersName] = useState("");
 
   // FUNCTIONS
   const addProduct = () => {
     if (!productName || !productStock) return;
+
+    const prod = fetch("http://localhost:3000/products", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: productName, stock: productStock })
+    }).then(res => res.json());
+
+    console.log("prod=", prod)
     setProducts([...products, { name: productName, stock: productStock }]);
     setProductName("");
     setProductStock("");
@@ -45,6 +57,18 @@ export default function App() {
     setCustomerName("");
   };
 
+  const addVendors = () => {
+    if (!vendorsName) return;
+    setVendors([...vendors, vendorsName]);
+    setVendorsName("");
+  };
+
+  const addUsers = () => {
+    if (!usersName) return;
+    setUsers([...users, usersName]);
+    setUsersName("");
+  };
+
   // PAGES
   const renderPage = () => {
     switch (page) {
@@ -52,16 +76,8 @@ export default function App() {
         return (
           <>
             <h2>Products</h2>
-            <input
-              placeholder="Product Name"
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
-            />
-            <input
-              placeholder="Stock"
-              value={productStock}
-              onChange={(e) => setProductStock(e.target.value)}
-            />
+            <input placeholder="Product Name" value={productName} onChange={(e) => setProductName(e.target.value)} />
+            <input placeholder="Stock" value={productStock} onChange={(e) => setProductStock(e.target.value)} />
             <button onClick={addProduct}>Add</button>
 
             <ul>
@@ -72,63 +88,82 @@ export default function App() {
           </>
         );
 
-      case "categories":
-        return (
-          <>
-            <h2>Categories</h2>
-            <input
-              placeholder="New Category"
-              value={categoryName}
-              onChange={(e) => setCategoryName(e.target.value)}
-            />
-            <button onClick={addCategory}>Add</button>
+        case "categories":
+       return (
+       <>
+       <h2>Categories</h2>
+       <input
+        value={categoryName}
+        onChange={(e) => setCategoryName(e.target.value)}
+      />
+      <button onClick={addCategory}>Add</button>
 
-            <ul>
-              {categories.map((c, i) => (
-                <li key={i}>{c}</li>
-              ))}
-            </ul>
-          </>
-        );
+      <ul>
+        {categories.map((c, i) => (
+          <li key={i}>{c}</li>
+        ))}
+      </ul>
+       </>
+       );
 
-      case "purchase":
-        return (
-          <>
-            <h2>Purchase Entry</h2>
-            <input
-              placeholder="Item"
-              value={purchaseItem}
-              onChange={(e) => setPurchaseItem(e.target.value)}
-            />
-            <input
-              placeholder="Quantity"
-              value={purchaseQty}
-              onChange={(e) => setPurchaseQty(e.target.value)}
-            />
-            <button onClick={addPurchase}>Add</button>
-
-            <ul>
-              {purchases.map((p, i) => (
-                <li key={i}>{p.item} - {p.qty}</li>
-              ))}
-            </ul>
-          </>
-        );
-
+         case "purchase":
+       return (
+      <>
+      <h2>Purchase</h2>
+      <input
+        value={purchaseItem}
+        onChange={(e) => setPurchaseItem(e.target.value)}
+      />
+      <input
+        value={purchaseQty}
+        onChange={(e) => setPurchaseQty(e.target.value)}
+      />
+      <button onClick={addPurchase}>Add</button>
+     </>
+     );
+     
       case "customers":
+     return (
+     <>
+      <h2>Customers</h2>
+      <input
+        value={customerName}
+        onChange={(e) => setCustomerName(e.target.value)}
+      />
+      <button onClick={addCustomer}>Add</button>
+
+      <ul>
+        {customers.map((c, i) => (
+          <li key={i}>{c}</li>
+        ))}
+      </ul>
+      </>
+    );
+
+
+      case "vendors":
         return (
           <>
-            <h2>Customers</h2>
-            <input
-              placeholder="Customer Name"
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
-            />
-            <button onClick={addCustomer}>Add</button>
-
+            <h2>Vendors</h2>
+            <input placeholder="Vendor Name" value={vendorsName} onChange={(e) => setVendorsName(e.target.value)} />
+            <button onClick={addVendors}>Add Vendor</button>
             <ul>
-              {customers.map((c, i) => (
-                <li key={i}>{c}</li>
+              {vendors.map((v, i) => (
+                <li key={i}>{v}</li>
+              ))}
+            </ul>
+          </>
+        );
+
+      case "users":
+        return (
+          <>
+            <h2>Users</h2>
+            <input placeholder="User Name" value={usersName} onChange={(e) => setUsersName(e.target.value)} />
+            <button onClick={addUsers}>Add User</button>
+            <ul>
+              {users.map((u, i) => (
+                <li key={i}>{u}</li>
               ))}
             </ul>
           </>
@@ -138,14 +173,9 @@ export default function App() {
         return (
           <>
             <h1>Dashboard</h1>
-
             <div className="cards">
-              <div className="card blue">Products: {products.length}</div>
-              <div className="card green">
-                Stock: {products.reduce((a, b) => a + Number(b.stock || 0), 0)}
-              </div>
-              <div className="card yellow">Orders: 0</div>
-              <div className="card purple">Revenue: ₹1000</div>
+              <div className="card">Products: {products.length}</div>
+              <div className="card">Stock: {products.reduce((a, b) => a + Number(b.stock || 0), 0)}</div>
             </div>
           </>
         );
@@ -154,19 +184,23 @@ export default function App() {
 
   return (
     <div className="app">
-      {/* Sidebar */}
       <div className="sidebar">
-        <h2>Inventory MS</h2>
-
+        <h2>Inventory</h2>
         <button onClick={() => setPage("dashboard")}>Dashboard</button>
         <button onClick={() => setPage("products")}>Products</button>
-        <button onClick={() => setPage("categories")}>Categories</button>
-        <button onClick={() => setPage("purchase")}>Purchase</button>
+        <button onClick={() => setPage("vendors")}>Vendors</button>
+        <button onClick={() => setPage("users")}>Users</button>
         <button onClick={() => setPage("customers")}>Customers</button>
+        <button onClick={() => setPage("purchase")}>Purchase</button>
+        <button onClick={() => setPage("categories")}>Categories</button>
       </div>
 
-      {/* Main */}
-      <div className="main">{renderPage()}</div>
+      <div className="main">
+        <div className="box">
+          {renderPage()}
+        </div>
+      </div>
     </div>
   );
-} 
+}
+
