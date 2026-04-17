@@ -18,8 +18,8 @@ router.post("/", (req, res) => {
 
 //  READ All Products
 router.get("/", (req, res) => {
-    const data = db.prepare("SELECT * FROM products").all();
-    res.json(data);
+    console.log("ERROR:", err.message); 
+        res.status(500).send(err.message);
 });
 
 
