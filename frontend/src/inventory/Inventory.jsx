@@ -7,7 +7,6 @@ import {
   ArrowDownRight, Boxes, Truck, Trash2, X
 } from "lucide-react";
 
-// ─── MOCK DATA ──────────────────────────────────────────────────────────────
 const MOCK_SALES = [42,38,55,61,47,70,82,66,74,58,90,84,77,95,88,102,78,110,94,84];
 
 const LOCATIONS  = [
@@ -49,7 +48,7 @@ const PREDICTIONS = [
   { emoji:"", name:"Bread 400g",       meta:"Restock recommended", pct:28, risk:"Low Risk",   rtype:"ok"   },
 ];
 
-// ─── MINI BAR CHART (pure CSS/SVG, no lib needed) ──────────────────────────
+// ─── MINI BAR CHART ──────────────────────────────────────────────────────────
 function MiniBarChart({ data, color = "#6366f1", height = 120 }) {
   const max = Math.max(...data);
   const w = 100 / data.length;
@@ -58,16 +57,7 @@ function MiniBarChart({ data, color = "#6366f1", height = 120 }) {
       {data.map((v, i) => {
         const barH = (v / max) * (height - 8);
         return (
-          <rect
-            key={i}
-            x={i * w + 0.5}
-            y={height - barH}
-            width={w - 1}
-            height={barH}
-            rx="2"
-            fill={color}
-            opacity="0.85"
-          />
+          <rect key={i} x={i * w + 0.5} y={height - barH} width={w - 1} height={barH} rx="2" fill={color} opacity="0.85" />
         );
       })}
     </svg>
@@ -98,7 +88,7 @@ function PLBarChart({ height = 120 }) {
   );
 }
 
-// ─── BADGE ──────────────────────────────────────────────────────────────────
+// ─── BADGE ───────────────────────────────────────────────────────────────────
 const BADGE = {
   crit: { bg:"rgba(244,63,94,.15)",   color:"#f43f5e" },
   warn: { bg:"rgba(245,158,11,.15)",  color:"#f59e0b" },
@@ -115,11 +105,11 @@ function Badge({ type, children }) {
   );
 }
 
-// ─── KPI CARD ───────────────────────────────────────────────────────────────
+// ─── KPI CARD ────────────────────────────────────────────────────────────────
 function KpiCard({ label, value, delta, up, Icon, accent }) {
   return (
     <div style={{
-      background:"#1c2235", border:"1px solid rgba(255,255,255,0.07)",
+      background:"#071438", border:"1px solid rgba(255, 255, 255, 0.96)",
       borderRadius:12, padding:"16px 18px", position:"relative", overflow:"hidden"
     }}>
       <div style={{
@@ -127,7 +117,7 @@ function KpiCard({ label, value, delta, up, Icon, accent }) {
         borderRadius:"50%", background:accent, opacity:0.1
       }} />
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10 }}>
-        <span style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.8px" }}>{label}</span>
+        <span style={{ fontSize:11, color:"#2f77dc", textTransform:"uppercase", letterSpacing:"0.8px" }}>{label}</span>
         <Icon size={15} color={accent} />
       </div>
       <div style={{ fontFamily:"'Syne',sans-serif", fontSize:26, fontWeight:700, color:"#fff", marginBottom:6 }}>{value}</div>
@@ -139,38 +129,38 @@ function KpiCard({ label, value, delta, up, Icon, accent }) {
   );
 }
 
-// ─── SECTION TITLE ──────────────────────────────────────────────────────────
+// ─── SECTION TITLE ───────────────────────────────────────────────────────────
 function SectionHead({ title, sub, action }) {
   return (
     <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
       <div>
         <div style={{ fontFamily:"'Syne',sans-serif", fontSize:14, fontWeight:700, color:"#fff" }}>{title}</div>
-        {sub && <div style={{ fontSize:11, color:"#64748b", marginTop:2 }}>{sub}</div>}
+        {sub && <div style={{ fontSize:11, color:"#eaedf1", marginTop:2 }}>{sub}</div>}
       </div>
       {action}
     </div>
   );
 }
 
-// ─── CARD WRAPPER ───────────────────────────────────────────────────────────
+// ─── CARD WRAPPER ────────────────────────────────────────────────────────────
 function Card({ children, style }) {
   return (
     <div style={{
-      background:"#1c2235", border:"1px solid rgba(255,255,255,0.07)",
+      background:"#071438", border:"1px solid rgba(255, 255, 255, 0.46)",
       borderRadius:12, padding:18, ...style
     }}>{children}</div>
   );
 }
 
-// ─── MODAL ──────────────────────────────────────────────────────────────────
+// ─── MODAL ───────────────────────────────────────────────────────────────────
 function Modal({ title, onClose, children }) {
   return (
     <div style={{
-      position:"fixed", inset:0, background:"rgba(0,0,0,0.65)",
+      position:"fixed", inset:0, background:"rgba(20, 20, 20, 0.65)",
       display:"flex", alignItems:"center", justifyContent:"center", zIndex:999
     }}>
       <div style={{
-        background:"#1c2235", border:"1px solid rgba(255,255,255,0.1)",
+        background:"#1c2235", border:"1px solid rgba(255, 255, 255, 0.46)",
         borderRadius:14, padding:24, minWidth:360, maxWidth:460, width:"90%"
       }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:18 }}>
@@ -185,7 +175,7 @@ function Modal({ title, onClose, children }) {
   );
 }
 
-// ─── INPUT ──────────────────────────────────────────────────────────────────
+// ─── INPUT ───────────────────────────────────────────────────────────────────
 function Field({ label, id, ...props }) {
   return (
     <div style={{ marginBottom:14 }}>
@@ -195,8 +185,8 @@ function Field({ label, id, ...props }) {
         name={id}
         {...props}
         style={{
-          width:"100%", background:"#0f1117", border:"1px solid rgba(255,255,255,0.1)",
-          borderRadius:8, padding:"9px 12px", fontSize:13, color:"#e2e8f0",
+          width:"100%", background:"#111111", border:"1px solid rgba(255,255,255,0.1)",
+          borderRadius:8, padding:"9px 12px", fontSize:13, color:"#e2eaf0",
           fontFamily:"'DM Sans',sans-serif", outline:"none", boxSizing:"border-box"
         }}
       />
@@ -204,14 +194,14 @@ function Field({ label, id, ...props }) {
   );
 }
 
-// ─── BTN ────────────────────────────────────────────────────────────────────
+// ─── BTN ─────────────────────────────────────────────────────────────────────
 function Btn({ children, onClick, ghost, danger, icon: Icon, full }) {
   return (
     <button onClick={onClick} style={{
       display:"flex", alignItems:"center", justifyContent:"center", gap:7,
       background: danger ? "#f43f5e" : ghost ? "rgba(255,255,255,0.05)" : "#6366f1",
       border: ghost ? "1px solid rgba(255,255,255,0.1)" : "none",
-      borderRadius:8, padding:"9px 16px", fontSize:13, color:"#fff",
+      borderRadius:8, padding:"9px 16px", fontSize:13, color:"#d1bfbf",
       fontFamily:"'DM Sans',sans-serif", fontWeight:500, cursor:"pointer",
       transition:"opacity .18s", width: full ? "100%" : "auto"
     }}>
@@ -220,7 +210,7 @@ function Btn({ children, onClick, ghost, danger, icon: Icon, full }) {
   );
 }
 
-// ─── ENTITY TABLE ────────────────────────────────────────────────────────────
+// ─── ENTITY TABLE ─────────────────────────────────────────────────────────────
 function EntityTable({ columns, rows, onDelete }) {
   return (
     <div style={{ overflowX:"auto" }}>
@@ -228,18 +218,18 @@ function EntityTable({ columns, rows, onDelete }) {
         <thead>
           <tr>
             {columns.map(c => (
-              <th key={c} style={{ textAlign:"left", padding:"8px 12px", color:"#64748b", fontWeight:500, borderBottom:"1px solid rgba(255,255,255,0.07)", fontSize:11, textTransform:"uppercase", letterSpacing:"0.6px" }}>{c}</th>
+              <th key={c} style={{ textAlign:"left", padding:"8px 12px", color:"#f5f7fa", fontWeight:500, borderBottom:"1px solid rgba(255,255,255,0.07)", fontSize:11, textTransform:"uppercase", letterSpacing:"0.6px" }}>{c}</th>
             ))}
-            <th style={{ textAlign:"right", padding:"8px 12px", color:"#64748b", fontWeight:500, borderBottom:"1px solid rgba(255,255,255,0.07)", fontSize:11 }}>Actions</th>
+            <th style={{ textAlign:"right", padding:"8px 12px", color:"#cfd7e1", fontWeight:500, borderBottom:"1px solid rgba(255,255,255,0.07)", fontSize:11 }}>Actions</th>
           </tr>
         </thead>
         <tbody>
           {rows.length === 0 ? (
             <tr><td colSpan={columns.length+1} style={{ textAlign:"center", padding:28, color:"#64748b" }}>No records yet</td></tr>
           ) : rows.map((row, i) => (
-            <tr key={i} style={{ borderBottom:"1px solid rgba(255,255,255,0.04)" }}>
+            <tr key={i} style={{ borderBottom:"1px solid rgba(231, 189, 189, 0.04)" }}>
               {Object.values(row).map((val, j) => (
-                <td key={j} style={{ padding:"11px 12px", color:"#e2e8f0" }}>{val}</td>
+                <td key={j} style={{ padding:"11px 12px", color:"#f5f7fa" }}>{val}</td>
               ))}
               <td style={{ padding:"11px 12px", textAlign:"right" }}>
                 <button onClick={() => onDelete(i)} style={{ background:"rgba(244,63,94,.12)", border:"none", borderRadius:6, padding:"4px 8px", color:"#f43f5e", cursor:"pointer" }}>
@@ -273,8 +263,8 @@ function DashboardPage() {
       <div style={{ display:"grid", gridTemplateColumns:"1.6fr 1fr", gap:14 }}>
         <Card>
           <SectionHead title="Daily Sales — April 2026" sub="Last 20 days" />
-          <MiniBarChart data={MOCK_SALES} color="#6366f1" height={150} />
-          <div style={{ display:"flex", gap:16, marginTop:10, fontSize:11, color:"#64748b" }}>
+          <MiniBarChart data={MOCK_SALES} color="#f05518" height={150} />
+          <div style={{ display:"flex", gap:16, marginTop:10, fontSize:11, color:"#dae5f5" }}>
             <span>Peak: ₹110k (Apr 18)</span>
             <span>Avg: ₹74k/day</span>
           </div>
@@ -284,7 +274,7 @@ function DashboardPage() {
           {ALERTS.map((a, i) => (
             <div key={i} style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 0", borderBottom: i<ALERTS.length-1 ? "1px solid rgba(255,255,255,0.06)" : "none" }}>
               <div style={{ width:32, height:32, borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", background: a.type==="crit" ? "rgba(244,63,94,.12)" : a.type==="warn" ? "rgba(245,158,11,.12)" : "rgba(34,211,238,.12)" }}>
-                <a.icon size={14} color={ a.type==="crit" ? "#f43f5e" : a.type==="warn" ? "#f59e0b" : "#22d3ee" }/>
+                <a.icon size={14} color={ a.type==="crit" ? "#f43f5e" : a.type==="warn" ? "#d7ee09" : "#22d3ee" }/>
               </div>
               <div style={{ flex:1, minWidth:0 }}>
                 <div style={{ fontSize:13, fontWeight:500, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{a.name}</div>
@@ -307,7 +297,7 @@ function DashboardPage() {
                 <div style={{ fontSize:13, fontWeight:500, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{p.name}</div>
                 <div style={{ display:"flex", alignItems:"center", gap:6, marginTop:3 }}>
                   <Badge type={p.type==="fast" ? "ok" : "crit"}>{p.type==="fast" ? "Fast" : "Slow"}</Badge>
-                  <div style={{ flex:1, height:4, background:"rgba(255,255,255,0.07)", borderRadius:3, overflow:"hidden" }}>
+                  <div style={{ flex:1, height:4, background:"rgba(8, 8, 8, 0.07)", borderRadius:3, overflow:"hidden" }}>
                     <div style={{ width:`${p.speed}%`, height:"100%", background: p.type==="fast" ? "#10b981" : "#f43f5e", borderRadius:3 }}/>
                   </div>
                 </div>
@@ -321,11 +311,11 @@ function DashboardPage() {
           <SectionHead title="AI Predictions" sub="Next 7 days" />
           <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
             {PREDICTIONS.map((p, i) => (
-              <div key={i} style={{ background:"#212840", borderRadius:9, padding:"10px 12px", display:"flex", alignItems:"center", gap:10 }}>
+              <div key={i} style={{ background:"#121212", borderRadius:9, padding:"10px 12px", display:"flex", alignItems:"center", gap:10 }}>
                 <span style={{ fontSize:18 }}>{p.emoji}</span>
                 <div style={{ flex:1, minWidth:0 }}>
                   <div style={{ fontSize:12.5, fontWeight:500, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{p.name}</div>
-                  <div style={{ fontSize:11, color:"#64748b" }}>{p.meta}</div>
+                  <div style={{ fontSize:11, color:"#2e2f30" }}>{p.meta}</div>
                   <div style={{ height:4, background:"rgba(255,255,255,0.08)", borderRadius:3, overflow:"hidden", marginTop:5 }}>
                     <div style={{ width:`${p.pct}%`, height:"100%", background:"linear-gradient(90deg,#6366f1,#22d3ee)", borderRadius:3 }}/>
                   </div>
@@ -342,7 +332,7 @@ function DashboardPage() {
             {LOCATIONS.map((l, i) => {
               const s = STATUS_META[l.status];
               return (
-                <div key={i} style={{ background:"#212840", borderRadius:9, padding:"10px 12px", border:"1px solid rgba(255,255,255,0.05)" }}>
+                <div key={i} style={{ background:"#121213", borderRadius:9, padding:"10px 12px", border:"1px solid rgba(255,255,255,0.05)" }}>
                   <div style={{ fontSize:11, color:"#64748b", marginBottom:4, display:"flex", alignItems:"center", gap:4 }}>
                     <l.icon size={11}/>{l.name}
                   </div>
@@ -391,13 +381,14 @@ function DashboardPage() {
   );
 }
 
-// ─── PRODUCTS PAGE ───────────────────────────────────────────────────────────
+// ─── PRODUCTS PAGE ────────────────────────────────────────────────────────────
 function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [modal, setModal] = useState(false);
   const [name, setName] = useState("");
   const [stock, setStock] = useState("");
   const [price, setPrice] = useState("");
+  const [description, setDescription] = useState("");
 
   const add = async () => {
     if (!name || !stock) return;
@@ -405,14 +396,14 @@ function ProductsPage() {
       const res = await fetch("http://localhost:3000/products", {
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({ name, stock:Number(stock), price:Number(price)||0, description:"" })
+        body:JSON.stringify({ name, stock:Number(stock), price:Number(price)||0, description })
       });
       await res.json();
-      setProducts(p => [...p, { name, stock:Number(stock), price:`₹${price||0}`, status: Number(stock)<10 ? "Low":"In Stock" }]);
+      setProducts(p => [...p, { name, stock:Number(stock), price:`₹${price||0}`, description, status: Number(stock)<10 ? "Low":"In Stock" }]);
     } catch {
-      setProducts(p => [...p, { name, stock:Number(stock), price:`₹${price||0}`, status: Number(stock)<10 ? "Low":"In Stock" }]);
+      setProducts(p => [...p, { name, stock:Number(stock), price:`₹${price||0}`, description, status: Number(stock)<10 ? "Low":"In Stock" }]);
     }
-    setName(""); setStock(""); setPrice(""); setModal(false);
+    setName(""); setStock(""); setPrice(""); setDescription(""); setModal(false);
   };
 
   return (
@@ -433,9 +424,10 @@ function ProductsPage() {
       </Card>
       {modal && (
         <Modal title="Add Product" onClose={() => setModal(false)}>
-          <Field label="Product Name" id="product-name" placeholder="e.g. Basmati Rice 1kg" value={name} onChange={e=>setName(e.target.value)} />
-          <Field label="Stock Quantity" id="product-stock" type="number" placeholder="e.g. 100" value={stock} onChange={e=>setStock(e.target.value)} />
-          <Field label="Price (₹)" id="product-price" type="number" placeholder="e.g. 120" value={price} onChange={e=>setPrice(e.target.value)} />
+          <Field label="Product Name"    id="product-name"        placeholder="e.g. Basmati Rice 1kg"     value={name}        onChange={e=>setName(e.target.value)} />
+          <Field label="Stock Quantity"  id="product-stock"       placeholder="e.g. 100" type="number"    value={stock}       onChange={e=>setStock(e.target.value)} />
+          <Field label="Price (₹)"       id="product-price"       placeholder="e.g. 120" type="number"    value={price}       onChange={e=>setPrice(e.target.value)} />
+          <Field label="Description"     id="product-description" placeholder="e.g. Aromatic and delicious" value={description} onChange={e=>setDescription(e.target.value)} />
           <div style={{ display:"flex", gap:8, marginTop:4 }}>
             <Btn ghost onClick={() => setModal(false)} full>Cancel</Btn>
             <Btn onClick={add} full>Add Product</Btn>
@@ -446,7 +438,7 @@ function ProductsPage() {
   );
 }
 
-// ─── GENERIC LIST PAGE ───────────────────────────────────────────────────────
+// ─── GENERIC LIST PAGE ────────────────────────────────────────────────────────
 function ListPage({ title, fields, columns, apiUrl }) {
   const [items, setItems] = useState([]);
   const [modal, setModal] = useState(false);
@@ -471,7 +463,7 @@ function ListPage({ title, fields, columns, apiUrl }) {
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20 }}>
         <div>
           <div style={{ fontFamily:"'Syne',sans-serif", fontSize:20, fontWeight:700, color:"#fff" }}>{title}</div>
-          <div style={{ fontSize:13, color:"#64748b", marginTop:3 }}>{items.length} records</div>
+          <div style={{ fontSize:13, color:"#c5cdd7", marginTop:3 }}>{items.length} records</div>
         </div>
         <Btn icon={Plus} onClick={() => setModal(true)}>Add {title.replace(/s$/,"")}</Btn>
       </div>
@@ -501,7 +493,7 @@ function ListPage({ title, fields, columns, apiUrl }) {
   );
 }
 
-// ─── CATEGORIES ─────────────────────────────────────────────────────────────
+// ─── CATEGORIES ──────────────────────────────────────────────────────────────
 function CategoriesPage() {
   const [cats, setCats] = useState(["Tech","Fashion"]);
   const [val, setVal] = useState("");
@@ -516,14 +508,14 @@ function CategoriesPage() {
       <Card style={{ marginBottom:16 }}>
         <div style={{ display:"flex", gap:10 }}>
           <input id="cat-name" name="cat-name" value={val} onChange={e=>setVal(e.target.value)} placeholder="New category name…"
-            style={{ flex:1, background:"#0f1117", border:"1px solid rgba(255,255,255,0.1)", borderRadius:8, padding:"9px 12px", fontSize:13, color:"#e2e8f0", fontFamily:"'DM Sans',sans-serif", outline:"none" }}
+            style={{ flex:1, background:"#0f1117", border:"1px solid rgba(43, 40, 40, 0.1)", borderRadius:8, padding:"9px 12px", fontSize:13, color:"#e2e8f0", fontFamily:"'DM Sans',sans-serif", outline:"none" }}
           />
           <Btn icon={Plus} onClick={() => { if(val){ setCats(c=>[...c,val]); setVal(""); } }}>Add</Btn>
         </div>
       </Card>
       <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))", gap:10 }}>
         {cats.map((c, i) => (
-          <div key={i} style={{ background:"#1c2235", border:"1px solid rgba(255,255,255,0.07)", borderRadius:10, padding:"14px 16px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <div key={i} style={{ background:"#384981", border:"1px solid rgba(255,255,255,0.07)", borderRadius:10, padding:"14px 16px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <div style={{ display:"flex", alignItems:"center", gap:8 }}>
               <Tag size={14} color="#6366f1"/>
               <span style={{ fontSize:13, fontWeight:500 }}>{c}</span>
@@ -560,7 +552,20 @@ export default function App() {
     switch(page) {
       case "dashboard":  return <DashboardPage />;
       case "products":   return <ProductsPage />;
-      case "vendors":    return <ListPage title="Vendors"   columns={["Name","Contact","City","Status"]}   fields={[{id:"Name",label:"Vendor Name",placeholder:"e.g. Reliance",required:true},{id:"Contact",label:"Contact",placeholder:"+91 98765..."},{id:"City",label:"City",placeholder:"Mumbai"},{id:"Status",label:"Status",placeholder:"Active"}]} apiUrl="http://localhost:3000/vendors" />;
+
+      // ✅ FIXED: field ids ab DB columns se match karte hain (name, phone, email, address)
+      case "vendors":    return <ListPage
+                                  title="Vendors"
+                                  columns={["Name", "Phone", "Email", "Address"]}
+                                  fields={[
+                                    { id:"name",    label:"Vendor Name", placeholder:"e.g. Reliance",          required:true },
+                                    { id:"phone",   label:"Phone",       placeholder:"+91 98765 43210"                       },
+                                    { id:"email",   label:"Email",       placeholder:"vendor@email.com", type:"email"        },
+                                    { id:"address", label:"Address",     placeholder:"e.g. Mumbai, Maharashtra"              },
+                                  ]}
+                                  apiUrl="http://localhost:3000/vendors"
+                                />;
+
       case "users":      return <ListPage title="Users"     columns={["Name","Role","Email"]}              fields={[{id:"Name",label:"Full Name",placeholder:"e.g. Rahul Kumar",required:true},{id:"Role",label:"Role",placeholder:"Admin / Staff"},{id:"Email",label:"Email",placeholder:"rahul@example.com",type:"email"}]} />;
       case "customers":  return <ListPage title="Customers" columns={["Name","Phone","City"]}              fields={[{id:"Name",label:"Customer Name",placeholder:"e.g. Priya Sharma",required:true},{id:"Phone",label:"Phone",placeholder:"+91 98765..."},{id:"City",label:"City",placeholder:"Delhi"}]} />;
       case "purchase":   return <ListPage title="Purchases" columns={["Item","Qty","Vendor","Date"]}       fields={[{id:"Item",label:"Item Name",placeholder:"e.g. Basmati Rice",required:true},{id:"Qty",label:"Quantity",placeholder:"50",type:"number",required:true},{id:"Vendor",label:"Vendor",placeholder:"Reliance"},{id:"Date",label:"Date",type:"date"}]} />;
@@ -579,22 +584,19 @@ export default function App() {
         ::-webkit-scrollbar-track{background:#0f1117}
         ::-webkit-scrollbar-thumb{background:#2d3452;border-radius:4px}
         input::placeholder{color:#64748b}
-        button:focus-visible{outline:2px solid #6366f1;outline-offset:2px}
+        button:focus-visible{outline:2px solid #646597;outline-offset:2px}
       `}</style>
 
       <div style={{ display:"flex", minHeight:"100vh", background:"#0f1117" }}>
 
         {/* SIDEBAR */}
-        <div style={{ width:220, background:"#161b27", borderRight:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", flexShrink:0, position:"sticky", top:0, height:"100vh" }}>
-          {/* Logo */}
+        <div style={{ width:220, background:"#0c0c0c", borderRight:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", flexShrink:0, position:"sticky", top:0, height:"100vh" }}>
           <div style={{ padding:"20px 20px 16px", borderBottom:"1px solid rgba(255,255,255,0.06)", display:"flex", alignItems:"center", gap:10 }}>
             <div style={{ width:30, height:30, background:"#6366f1", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center" }}>
               <Boxes size={16} color="#fff"/>
             </div>
             <span style={{ fontFamily:"'Syne',sans-serif", fontSize:17, fontWeight:700, color:"#fff" }}>StockIQ</span>
           </div>
-
-          {/* Nav */}
           <nav style={{ flex:1, padding:"12px 8px", overflowY:"auto" }}>
             <div style={{ fontSize:10, color:"#475569", textTransform:"uppercase", letterSpacing:"1.2px", padding:"6px 10px 8px" }}>Main</div>
             {NAV.map(({ id, label, Icon, badge }) => (
@@ -614,8 +616,6 @@ export default function App() {
               </button>
             ))}
           </nav>
-
-          {/* User card */}
           <div style={{ padding:"12px" }}>
             <div style={{ background:"#1c2235", border:"1px solid rgba(255,255,255,0.07)", borderRadius:10, padding:"10px 12px", display:"flex", alignItems:"center", gap:10 }}>
               <div style={{ width:34, height:34, borderRadius:"50%", background:"linear-gradient(135deg,#6366f1,#22d3ee)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Syne',sans-serif", fontSize:12, fontWeight:700, color:"#fff", flexShrink:0 }}>RK</div>
@@ -632,7 +632,7 @@ export default function App() {
         <div style={{ flex:1, display:"flex", flexDirection:"column", minWidth:0, overflow:"hidden" }}>
 
           {/* TOPBAR */}
-          <div style={{ background:"#161b27", borderBottom:"1px solid rgba(255,255,255,0.06)", padding:"12px 24px", display:"flex", alignItems:"center", gap:16, position:"sticky", top:0, zIndex:10 }}>
+          <div style={{ background:"#ffffff", borderBottom:"1px solid rgba(255,255,255,0.06)", padding:"12px 24px", display:"flex", alignItems:"center", gap:16, position:"sticky", top:0, zIndex:10 }}>
             <div style={{ flex:1, maxWidth:380, position:"relative" }}>
               <Search size={14} color="#64748b" style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)" }}/>
               <input
@@ -648,7 +648,6 @@ export default function App() {
               />
             </div>
             <div style={{ marginLeft:"auto", display:"flex", alignItems:"center", gap:10 }}>
-              {/* Notif */}
               <button onClick={()=>setNotifOpen(n=>!n)} style={{ position:"relative", width:36, height:36, background:"#1c2235", border:"1px solid rgba(255,255,255,0.07)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>
                 <Bell size={15} color="#94a3b8"/>
                 <span style={{ position:"absolute", top:6, right:6, width:7, height:7, background:"#f43f5e", borderRadius:"50%", border:"1.5px solid #161b27" }}/>
@@ -672,7 +671,6 @@ export default function App() {
                   ))}
                 </div>
               )}
-              {/* User */}
               <div style={{ display:"flex", alignItems:"center", gap:8, background:"#1c2235", border:"1px solid rgba(255,255,255,0.07)", borderRadius:9, padding:"6px 12px 6px 6px", cursor:"pointer" }}>
                 <div style={{ width:26, height:26, borderRadius:"50%", background:"linear-gradient(135deg,#6366f1,#22d3ee)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:700, fontFamily:"'Syne',sans-serif", color:"#fff" }}>RK</div>
                 <span style={{ fontSize:12.5, fontWeight:500 }}>Rahul Kumar</span>

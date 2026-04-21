@@ -1,5 +1,5 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; }
+body { font-family: 'Segoe UI', sans-serif; background: #405b76; }
 
 /* Popup */
 .popup-overlay {
@@ -39,7 +39,7 @@ body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; }
 
 /* Card */
 .auth-card {
-  background: #fff; border: 1px solid #e2e8f0;
+  background: #d3caca; border: 1px solid #e2e8f0;
   border-radius: 14px; padding: 2.25rem 2.5rem;
   width: 100%; max-width: 400px;
 }
@@ -62,7 +62,7 @@ body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; }
 .field label { display: block; font-size: 13px; font-weight: 500; color: #4a5568; margin-bottom: 6px; }
 .field input {
   width: 100%; padding: 10px 13px;
-  border: 1.5px solid #cbd5e0; border-radius: 8px;
+  border: 1.5px solid #f3f6f9; border-radius: 8px;
   font-size: 14px; color: #1a202c; outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -81,13 +81,13 @@ body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; }
 /* Buttons */
 .btn-primary {
   width: 100%; padding: 11px;
-  background: #0C447C; color: #E6F1FB;
+  background: #5b2ce8; color: #E6F1FB;
   border: none; border-radius: 8px;
   font-size: 15px; font-weight: 600;
   cursor: pointer; margin-top: 6px;
   transition: background 0.15s;
 }
-.btn-primary:hover { background: #185FA5; }
+.btn-primary:hover { background: #2164a8; }
 
 .btn-secondary {
   width: 100%; padding: 10px;
@@ -96,7 +96,7 @@ body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; }
   font-size: 14px; font-weight: 500;
   cursor: pointer; transition: background 0.15s;
 }
-.btn-secondary:hover { background: #EBF8FF; }
+.btn-secondary:hover { background: #a1b5e1; }
 
 /* Divider */
 .divider {

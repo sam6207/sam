@@ -5,12 +5,18 @@ const db = require("../setup");
 
 //  CREATE Vendor
 router.post("/", (req, res) => {
-    const { name, contact } = req.body;
+    const { name, phone, email, address } = req.body; // ✅ DB columns se match
 
-    db.prepare("INSERT INTO vendors (name, contact) VALUES (?, ?)")
-      .run(name, contact);
+    if (!name) {
+        return res.status(400).json({ error: "Name is required" });
+    }
 
-    res.send("Vendor added");
+    db.prepare(`
+        INSERT INTO vendors (name, phone, email, address) 
+        VALUES (?, ?, ?, ?)
+    `).run(name, phone || null, email || null, address || null);
+
+    res.json({ success: true, message: "Vendor added" }); // ✅ JSON return karo
 });
 
 
