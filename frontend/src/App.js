@@ -1,18 +1,16 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import InvertoryApp from "./inventory/InventoryApp";
-import "./inventory/App.css";
+import InventoryApp from "./inventory/Inventory";
 
-export default function App() {
+export default function MainApp() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/dashboard" element={<InvertoryApp />} />
-        <Route path ="/css" element={<div>CSS</div>} />
+        <Route path="/dashboard" element={<InventoryApp />} />
       </Routes>
     </BrowserRouter>
   );
