@@ -19,23 +19,23 @@ router.get("/:id", (req, res) => {
 });
 
 router.post("/", (req, res) => {
-  const { name, email, phone } = req.body;
+  const { name, email, phone , address} = req.body;
   db.run(
-    "INSERT INTO customers (name, email, phone) VALUES (?, ?, ?)",
-    [name, email, phone],
+    "INSERT INTO customers (name, email, phone, address, buyer) VALUES (?, ?, ?, ?, ?)",
+    [name, email, phone, address, buyer],
     function (err) {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ id: this.lastID, name, email, phone });
+      res.json({ id: this.lastID, name, email, phone, address, buyer });
     }
   );
 });
 
 router.put("/:id", (req, res) => {
   const { id } = req.params;
-  const { name, email, phone } = req.body;
+  const { name, email, phone, address, buyer } = req.body;
   db.run(
-    "UPDATE customers SET name=?, email=?, phone=? WHERE id=?",
-    [name, email, phone, id],
+    "UPDATE customers SET name=?, email=?, phone=?, address=?, buyer=? WHERE id=?",
+    [name, email, phone, address, buyer, id],
     function (err) {
       if (err) return res.status(500).json({ error: err.message });
       if (this.changes === 0) return res.status(404).json({ message: "Customer not found" });

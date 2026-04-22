@@ -4,7 +4,8 @@ import {
   Store, UserCircle, Bell, Search, TrendingUp,
   AlertTriangle, RefreshCw, MapPin,
   DollarSign, Plus, LogOut, ChevronDown, ArrowUpRight,
-  ArrowDownRight, Boxes, Truck, Trash2, X
+  ArrowDownRight, Boxes, Truck, Trash2, X,
+  Receipt, FileText
 } from "lucide-react";
 
 const MOCK_SALES = [42,38,55,61,47,70,82,66,74,58,90,84,77,95,88,102,78,110,94,84];
@@ -161,7 +162,8 @@ function Modal({ title, onClose, children }) {
     }}>
       <div style={{
         background:"#1c2235", border:"1px solid rgba(255, 255, 255, 0.46)",
-        borderRadius:14, padding:24, minWidth:360, maxWidth:460, width:"90%"
+        borderRadius:14, padding:24, minWidth:360, maxWidth:460, width:"90%",
+        maxHeight:"90vh", overflowY:"auto"
       }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:18 }}>
           <span style={{ fontFamily:"'Syne',sans-serif", fontSize:16, fontWeight:700, color:"#fff" }}>{title}</span>
@@ -176,20 +178,36 @@ function Modal({ title, onClose, children }) {
 }
 
 // ─── INPUT ───────────────────────────────────────────────────────────────────
-function Field({ label, id, ...props }) {
+function Field({ label, id, type, ...props }) {
   return (
     <div style={{ marginBottom:14 }}>
       {label && <label htmlFor={id} style={{ display:"block", fontSize:12, color:"#94a3b8", marginBottom:5 }}>{label}</label>}
-      <input
-        id={id}
-        name={id}
-        {...props}
-        style={{
-          width:"100%", background:"#111111", border:"1px solid rgba(255,255,255,0.1)",
-          borderRadius:8, padding:"9px 12px", fontSize:13, color:"#e2eaf0",
-          fontFamily:"'DM Sans',sans-serif", outline:"none", boxSizing:"border-box"
-        }}
-      />
+      {type === "select" ? (
+        <select
+          id={id}
+          name={id}
+          {...props}
+          style={{
+            width:"100%", background:"#111111", border:"1px solid rgba(255,255,255,0.1)",
+            borderRadius:8, padding:"9px 12px", fontSize:13, color:"#e2eaf0",
+            fontFamily:"'DM Sans',sans-serif", outline:"none", boxSizing:"border-box"
+          }}
+        >
+          {props.children}
+        </select>
+      ) : (
+        <input
+          id={id}
+          name={id}
+          type={type || "text"}
+          {...props}
+          style={{
+            width:"100%", background:"#111111", border:"1px solid rgba(255,255,255,0.1)",
+            borderRadius:8, padding:"9px 12px", fontSize:13, color:"#e2eaf0",
+            fontFamily:"'DM Sans',sans-serif", outline:"none", boxSizing:"border-box"
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -218,7 +236,11 @@ function EntityTable({ columns, rows, onDelete }) {
         <thead>
           <tr>
             {columns.map(c => (
-              <th key={c} style={{ textAlign:"left", padding:"8px 12px", color:"#f5f7fa", fontWeight:500, borderBottom:"1px solid rgba(255,255,255,0.07)", fontSize:11, textTransform:"uppercase", letterSpacing:"0.6px" }}>{c}</th>
+              <th key={c} style={{ textAlign:"left", padding:"8px 12px", color:"#f5f7fa",
+                fontWeight:500, borderBottom:"1px solid rgba(255,255,255,0.07)",
+                fontSize:11, textTransform:"uppercase", letterSpacing:"0.6px" }}>
+                {c}
+              </th>
             ))}
             <th style={{ textAlign:"right", padding:"8px 12px", color:"#cfd7e1", fontWeight:500, borderBottom:"1px solid rgba(255,255,255,0.07)", fontSize:11 }}>Actions</th>
           </tr>
@@ -232,7 +254,8 @@ function EntityTable({ columns, rows, onDelete }) {
                 <td key={j} style={{ padding:"11px 12px", color:"#f5f7fa" }}>{val}</td>
               ))}
               <td style={{ padding:"11px 12px", textAlign:"right" }}>
-                <button onClick={() => onDelete(i)} style={{ background:"rgba(244,63,94,.12)", border:"none", borderRadius:6, padding:"4px 8px", color:"#f43f5e", cursor:"pointer" }}>
+                <button onClick={() => onDelete(i)} style={{ background:"rgba(244,63,94,.12)",
+                  border:"none", borderRadius:6, padding:"4px 8px", color:"#f43f5e", cursor:"pointer" }}>
                   <Trash2 size={13}/>
                 </button>
               </td>
@@ -272,8 +295,10 @@ function DashboardPage() {
         <Card>
           <SectionHead title="Smart Alerts" sub="7 active" />
           {ALERTS.map((a, i) => (
-            <div key={i} style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 0", borderBottom: i<ALERTS.length-1 ? "1px solid rgba(255,255,255,0.06)" : "none" }}>
-              <div style={{ width:32, height:32, borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", background: a.type==="crit" ? "rgba(244,63,94,.12)" : a.type==="warn" ? "rgba(245,158,11,.12)" : "rgba(34,211,238,.12)" }}>
+            <div key={i} style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 0", borderBottom:
+             i<ALERTS.length-1 ? "1px solid rgba(255,255,255,0.06)" : "none" }}>
+              <div style={{ width:32, height:32, borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", background: a.type==="crit" ? "rgba(244,63,94,.12)" :
+                 a.type==="warn" ? "rgba(245,158,11,.12)" : "rgba(34,211,238,.12)" }}>
                 <a.icon size={14} color={ a.type==="crit" ? "#f43f5e" : a.type==="warn" ? "#d7ee09" : "#22d3ee" }/>
               </div>
               <div style={{ flex:1, minWidth:0 }}>
@@ -417,7 +442,7 @@ function ProductsPage() {
       </div>
       <Card>
         <EntityTable
-          columns={["Name","Stock","Price","Status"]}
+          columns={["Name","Stock","Price","Description","Status"]}
           rows={products}
           onDelete={i => setProducts(p => p.filter((_,j)=>j!==i))}
         />
@@ -493,6 +518,244 @@ function ListPage({ title, fields, columns, apiUrl }) {
   );
 }
 
+// ─── SALES PAGE ───────────────────────────────────────────────────────────────
+function SalesPage() {
+  const [sales, setSales] = useState([]);
+  const [modal, setModal] = useState(false);
+  const [vals, setVals] = useState({
+    customer_id: "", products: "", quantity: "", price: "", sale_date: "", total_amount: ""
+  });
+
+  const handleChange = (field, value) => {
+    const updated = { ...vals, [field]: value };
+    // Auto-calculate total_amount when quantity or price changes
+    if (field === "quantity" || field === "price") {
+      const qty = field === "quantity" ? Number(value) : Number(updated.quantity);
+      const prc = field === "price"    ? Number(value) : Number(updated.price);
+      if (qty && prc) updated.total_amount = (qty * prc).toFixed(2);
+    }
+    setVals(updated);
+  };
+
+  const add = async () => {
+    if (!vals.customer_id || !vals.products || !vals.quantity) return;
+    try {
+      await fetch("http://localhost:3000/sales", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+          customer_id: vals.customer_id,
+          products:    vals.products,
+          quantity:    Number(vals.quantity),
+          price:       Number(vals.price),
+          sale_date:   vals.sale_date,
+          total_amount: Number(vals.total_amount)
+        })
+      });
+    } catch {}
+    setSales(s => [...s, {
+      "Customer ID":   vals.customer_id,
+      "Products":      vals.products,
+      "Qty":           vals.quantity,
+      "Price (₹)":     `₹${vals.price}`,
+      "Sale Date":     vals.sale_date,
+      "Total (₹)":     `₹${vals.total_amount}`
+    }]);
+    setVals({ customer_id:"", products:"", quantity:"", price:"", sale_date:"", total_amount:"" });
+    setModal(false);
+  };
+
+  return (
+    <>
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20 }}>
+        <div>
+          <div style={{ fontFamily:"'Syne',sans-serif", fontSize:20, fontWeight:700, color:"#fff" }}>Sales</div>
+          <div style={{ fontSize:13, color:"#c5cdd7", marginTop:3 }}>{sales.length} records</div>
+        </div>
+        <Btn icon={Plus} onClick={() => setModal(true)}>Add Sale</Btn>
+      </div>
+      <Card>
+        <EntityTable
+          columns={["Customer ID","Products","Qty","Price (₹)","Sale Date","Total (₹)"]}
+          rows={sales}
+          onDelete={i => setSales(s => s.filter((_,j)=>j!==i))}
+        />
+      </Card>
+      {modal && (
+        <Modal title="Add Sale" onClose={() => setModal(false)}>
+          <Field
+            label="Customer ID" id="sale-customer-id"
+            placeholder="e.g. C001" value={vals.customer_id}
+            onChange={e => handleChange("customer_id", e.target.value)}
+          />
+          <Field
+            label="Products" id="sale-products"
+            placeholder="e.g. Basmati Rice 1kg" value={vals.products}
+            onChange={e => handleChange("products", e.target.value)}
+          />
+          <Field
+            label="Quantity" id="sale-quantity" type="number"
+            placeholder="e.g. 5" value={vals.quantity}
+            onChange={e => handleChange("quantity", e.target.value)}
+          />
+          <Field
+            label="Price per unit (₹)" id="sale-price" type="number"
+            placeholder="e.g. 120" value={vals.price}
+            onChange={e => handleChange("price", e.target.value)}
+          />
+          <Field
+            label="Sale Date" id="sale-date" type="date"
+            value={vals.sale_date}
+            onChange={e => handleChange("sale_date", e.target.value)}
+          />
+          {/* Auto-calculated total — read-only display */}
+          <div style={{ marginBottom:14 }}>
+            <label style={{ display:"block", fontSize:12, color:"#94a3b8", marginBottom:5 }}>Total Amount (₹) — Auto Calculated</label>
+            <div style={{
+              background:"rgba(99,102,241,0.1)", border:"1px solid rgba(99,102,241,0.3)",
+              borderRadius:8, padding:"9px 12px", fontSize:13, color:"#a5b4fc",
+              fontWeight:600, fontFamily:"'DM Sans',sans-serif"
+            }}>
+              ₹{vals.total_amount || "0.00"}
+            </div>
+          </div>
+          <div style={{ display:"flex", gap:8, marginTop:4 }}>
+            <Btn ghost onClick={() => setModal(false)} full>Cancel</Btn>
+            <Btn onClick={add} full>Save Sale</Btn>
+          </div>
+        </Modal>
+      )}
+    </>
+  );
+}
+
+// ─── INVOICE PAGE ─────────────────────────────────────────────────────────────
+function InvoicePage() {
+  const [invoices, setInvoices] = useState([]);
+  const [modal, setModal] = useState(false);
+  const [vals, setVals] = useState({
+    customer_id: "", total_amount: "", status: "Pending", invoice_date: "", stocks: ""
+  });
+
+  const statusOptions = ["Pending", "Paid", "Cancelled", "Overdue"];
+
+  const add = async () => {
+    if (!vals.customer_id || !vals.total_amount) return;
+    try {
+      await fetch("http://localhost:3000/invoices", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+          customer_id:  vals.customer_id,
+          total_amount: Number(vals.total_amount),
+          status:       vals.status,
+          invoice_date: vals.invoice_date,
+          stocks:       vals.stocks
+        })
+      });
+    } catch {}
+
+    // eslint-disable-next-line no-unused-vars
+    const StatusColor = {
+      Paid: "ok", Pending: "warn", Cancelled: "crit", Overdue: "crit"
+    };
+
+    setInvoices(inv => [...inv, {
+      "Customer ID":    vals.customer_id,
+      "Total (₹)":      `₹${vals.total_amount}`,
+      "Status":         vals.status,
+      "Invoice Date":   vals.invoice_date,
+      "Stocks":         vals.stocks
+    }]);
+    setVals({ customer_id:"", total_amount:"", status:"Pending", invoice_date:"", stocks:"" });
+    setModal(false);
+  };
+
+  // Status badge render helper inside table
+  // eslint-disable-next-line no-unused-vars
+  const getStatusBadge = (status) => {
+    const map = { Paid:"ok", Pending:"warn", Cancelled:"crit", Overdue:"crit" };
+    return <Badge type={map[status] || "info"}>{status}</Badge>;
+  };
+
+  return (
+    <>
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20 }}>
+        <div>
+          <div style={{ fontFamily:"'Syne',sans-serif", fontSize:20, fontWeight:700, color:"#fff" }}>Invoices</div>
+          <div style={{ fontSize:13, color:"#c5cdd7", marginTop:3 }}>{invoices.length} records</div>
+        </div>
+        <Btn icon={Plus} onClick={() => setModal(true)}>Add Invoice</Btn>
+      </div>
+
+      {/* Summary KPI strip */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12, marginBottom:16 }}>
+        {[
+          { label:"Total Invoices", value: invoices.length, color:"#6366f1" },
+          { label:"Paid",           value: invoices.filter(i=>i.Status==="Paid").length,      color:"#10b981" },
+          { label:"Pending",        value: invoices.filter(i=>i.Status==="Pending").length,   color:"#f59e0b" },
+          { label:"Overdue",        value: invoices.filter(i=>i.Status==="Overdue" || i.Status==="Cancelled").length, color:"#f43f5e" },
+        ].map((k,i) => (
+          <div key={i} style={{ background:"#071438", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, padding:"12px 16px" }}>
+            <div style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.7px", marginBottom:6 }}>{k.label}</div>
+            <div style={{ fontFamily:"'Syne',sans-serif", fontSize:22, fontWeight:700, color:k.color }}>{k.value}</div>
+          </div>
+        ))}
+      </div>
+
+      <Card>
+        <EntityTable
+          columns={["Customer ID","Total (₹)","Status","Invoice Date","Stocks"]}
+          rows={invoices}
+          onDelete={i => setInvoices(inv => inv.filter((_,j)=>j!==i))}
+        />
+      </Card>
+
+      {modal && (
+        <Modal title="Add Invoice" onClose={() => setModal(false)}>
+          <Field
+            label="Customer ID" id="inv-customer-id"
+            placeholder="e.g. C001" value={vals.customer_id}
+            onChange={e => setVals(v=>({...v, customer_id:e.target.value}))}
+          />
+          <Field
+            label="Total Amount (₹)" id="inv-total" type="number"
+            placeholder="e.g. 5000" value={vals.total_amount}
+            onChange={e => setVals(v=>({...v, total_amount:e.target.value}))}
+          />
+          {/* Status — select dropdown */}
+          <div style={{ marginBottom:14 }}>
+            <label style={{ display:"block", fontSize:12, color:"#94a3b8", marginBottom:5 }}>Status</label>
+            <select
+              value={vals.status}
+              onChange={e => setVals(v=>({...v, status:e.target.value}))}
+              style={{
+                width:"100%", background:"#111111", border:"1px solid rgba(255,255,255,0.1)",
+                borderRadius:8, padding:"9px 12px", fontSize:13, color:"#e2eaf0",
+                fontFamily:"'DM Sans',sans-serif", outline:"none", boxSizing:"border-box"
+              }}
+            >
+              {statusOptions.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+          <Field
+            label="Invoice Date" id="inv-date" type="date"
+            value={vals.invoice_date}
+            onChange={e => setVals(v=>({...v, invoice_date:e.target.value}))}
+          />
+          <Field
+            label="Stocks / Items" id="inv-stocks"
+            placeholder="e.g. Rice 5kg, Salt 2kg" value={vals.stocks}
+            onChange={e => setVals(v=>({...v, stocks:e.target.value}))}
+          />
+          <div style={{ display:"flex", gap:8, marginTop:4 }}>
+            <Btn ghost onClick={() => setModal(false)} full>Cancel</Btn>
+            <Btn onClick={add} full>Save Invoice</Btn>
+          </div>
+        </Modal>
+      )}
+    </>
+  );
+}
+
 // ─── CATEGORIES ──────────────────────────────────────────────────────────────
 function CategoriesPage() {
   const [cats, setCats] = useState(["Tech","Fashion"]);
@@ -508,7 +771,8 @@ function CategoriesPage() {
       <Card style={{ marginBottom:16 }}>
         <div style={{ display:"flex", gap:10 }}>
           <input id="cat-name" name="cat-name" value={val} onChange={e=>setVal(e.target.value)} placeholder="New category name…"
-            style={{ flex:1, background:"#0f1117", border:"1px solid rgba(43, 40, 40, 0.1)", borderRadius:8, padding:"9px 12px", fontSize:13, color:"#e2e8f0", fontFamily:"'DM Sans',sans-serif", outline:"none" }}
+            style={{ flex:1, background:"#0f1117", border:"1px solid rgba(43, 40, 40, 0.1)",
+               borderRadius:8, padding:"9px 12px", fontSize:13, color:"#e2e8f0", fontFamily:"'DM Sans',sans-serif", outline:"none" }}
           />
           <Btn icon={Plus} onClick={() => { if(val){ setCats(c=>[...c,val]); setVal(""); } }}>Add</Btn>
         </div>
@@ -540,6 +804,8 @@ const NAV = [
   { id:"users",      label:"Users",      Icon:Users           },
   { id:"customers",  label:"Customers",  Icon:UserCircle      },
   { id:"purchase",   label:"Purchase",   Icon:ShoppingCart, badge:3 },
+  { id:"sales",      label:"Sales",      Icon:Receipt         },
+  { id:"invoice",    label:"Invoice",    Icon:FileText        },
   { id:"categories", label:"Categories", Icon:Tag             },
 ];
 
@@ -553,22 +819,58 @@ export default function App() {
       case "dashboard":  return <DashboardPage />;
       case "products":   return <ProductsPage />;
 
-      // ✅ FIXED: field ids ab DB columns se match karte hain (name, phone, email, address)
-      case "vendors":    return <ListPage
-                                  title="Vendors"
-                                  columns={["Name", "Phone", "Email", "Address"]}
-                                  fields={[
-                                    { id:"name",    label:"Vendor Name", placeholder:"e.g. Reliance",          required:true },
-                                    { id:"phone",   label:"Phone",       placeholder:"+91 98765 43210"                       },
-                                    { id:"email",   label:"Email",       placeholder:"vendor@email.com", type:"email"        },
-                                    { id:"address", label:"Address",     placeholder:"e.g. Mumbai, Maharashtra"              },
-                                  ]}
-                                  apiUrl="http://localhost:3000/vendors"
-                                />;
+      case "vendors":
+        return <ListPage
+          title="Vendors"
+          columns={["Name","Phone","Email","Address","GST","Vendor ID","Date Added","Rate"]}
+          fields={[
+            { id:"name",      label:"Vendor Name", placeholder:"e.g. Reliance",          required:true },
+            { id:"phone",     label:"Phone",       placeholder:"+91 98765 43210"                       },
+            { id:"email",     label:"Email",       placeholder:"vendor@email.com", type:"email"        },
+            { id:"address",   label:"Address",     placeholder:"e.g. Mumbai, Maharashtra"              },
+            { id:"GST",       label:"GST",         placeholder:"e.g. 27AABCC1234D1Z5"                  },
+            { id:"Vendor_ID", label:"Vendor ID",   placeholder:"e.g. V001"                             },
+            { id:"date",      label:"Date Added",  placeholder:"Select date", type:"date"              },
+            { id:"rate",      label:"Rate",        placeholder:"e.g. 100"                              },
+          ]}
+          apiUrl="http://localhost:3000/vendors"
+        />;
 
-      case "users":      return <ListPage title="Users"     columns={["Name","Role","Email"]}              fields={[{id:"Name",label:"Full Name",placeholder:"e.g. Rahul Kumar",required:true},{id:"Role",label:"Role",placeholder:"Admin / Staff"},{id:"Email",label:"Email",placeholder:"rahul@example.com",type:"email"}]} />;
-      case "customers":  return <ListPage title="Customers" columns={["Name","Phone","City"]}              fields={[{id:"Name",label:"Customer Name",placeholder:"e.g. Priya Sharma",required:true},{id:"Phone",label:"Phone",placeholder:"+91 98765..."},{id:"City",label:"City",placeholder:"Delhi"}]} />;
-      case "purchase":   return <ListPage title="Purchases" columns={["Item","Qty","Vendor","Date"]}       fields={[{id:"Item",label:"Item Name",placeholder:"e.g. Basmati Rice",required:true},{id:"Qty",label:"Quantity",placeholder:"50",type:"number",required:true},{id:"Vendor",label:"Vendor",placeholder:"Reliance"},{id:"Date",label:"Date",type:"date"}]} />;
+      case "users":
+        return <ListPage title="Users" columns={["Name","Role","Email"]}
+          fields={[
+            { id:"Name",  label:"Full Name", placeholder:"e.g. Rahul Kumar", required:true },
+            { id:"Role",  label:"Role",      placeholder:"Admin / Staff"                   },
+            { id:"Email", label:"Email",     placeholder:"rahul@example.com", type:"email" },
+          ]}
+        />;
+
+      case "customers":
+        return <ListPage title="Customers" columns={["Name","Phone","City","Address","Email","Buyer"]}
+          fields={[
+            { id:"Name",    label:"Customer Name", placeholder:"e.g. Priya Sharma", required:true },
+            { id:"Phone",   label:"Phone",         placeholder:"+91 98765..."                      },
+            { id:"City",    label:"City",           placeholder:"Delhi"                             },
+            { id:"address", label:"Address",        placeholder:"e.g. New Delhi"                   },
+            { id:"email",   label:"Email",          placeholder:"customer@email.com", type:"email" },
+            { id:"Buyer",   label:"Buyer",          placeholder:"e.g. John Doe"                    },
+          ]}
+          apiUrl="http://localhost:3000/customers"
+        />;
+
+      case "purchase":
+        return <ListPage title="Purchases" columns={["Item","Qty","Vendor","Date"]}
+          fields={[
+            { id:"Item",   label:"Item Name", placeholder:"e.g. Basmati Rice", required:true },
+            { id:"Qty",    label:"Quantity",  placeholder:"50", type:"number", required:true  },
+            { id:"Vendor", label:"Vendor",    placeholder:"Reliance"                          },
+            { id:"Date",   label:"Date",      type:"date"                                     },
+          ]}
+        />;
+
+      case "sales":   return <SalesPage />;
+      case "invoice": return <InvoicePage />;
+
       case "categories": return <CategoriesPage />;
       default: return <DashboardPage />;
     }
@@ -584,6 +886,7 @@ export default function App() {
         ::-webkit-scrollbar-track{background:#0f1117}
         ::-webkit-scrollbar-thumb{background:#2d3452;border-radius:4px}
         input::placeholder{color:#64748b}
+        select option{background:#1c2235}
         button:focus-visible{outline:2px solid #646597;outline-offset:2px}
       `}</style>
 
