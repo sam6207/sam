@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./Auth.css";
 
 export default function Signup() {
-  const [form, setForm] = useState({ username: "", email: "", password: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [popup, setPopup] = useState({ show: false, message: "", type: "" });
   const navigate = useNavigate();
 
@@ -15,8 +15,8 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.username.trim()) {
-      showPopup("Username is required!");
+    if (!form.name.trim()) {
+      showPopup("Name is required!");
       return;
     }
     if (!form.email.includes("@")) {
@@ -71,12 +71,12 @@ export default function Signup() {
 
         <form onSubmit={handleSubmit}>
           <div className="field">
-            <label>Username</label>
+            <label>Name</label>
             <input
               type="text"
-              value={form.username}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
-              placeholder="Choose a username"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              placeholder="Choose a name"
             />
           </div>
           <div className="field">

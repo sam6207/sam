@@ -1,5 +1,4 @@
 const Database = require('better-sqlite3');
-
 const db = new Database('inventory.sqlite');
 
 console.log('✅ Database connected!');
@@ -17,10 +16,9 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )
 `);
-console.log('✅ Vendors');
+console.log('✅ Vendors table');
 
 // 2. CUSTOMERS TABLE
-
 db.exec(`
   CREATE TABLE IF NOT EXISTS customers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -33,17 +31,19 @@ db.exec(`
 `);
 console.log('✅ Customers table');
 
-// 3. PRODUCTS TABLE
+// 3. PRODUCTS TABLE — status aur category add kiye
 db.exec(`
   CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     description TEXT,
-    price REAL NOT NULL,
+    price REAL DEFAULT 0,
     stock INTEGER DEFAULT 0,
+    status TEXT DEFAULT 'active',
+    category TEXT,
     vendor_id INTEGER,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (vendor_id) REFERENCES vendors(id)
+    FOREIGN KEY (vendor_id) REFERENCES vendors(id) ON DELETE SET NULL
   )
 `);
 console.log('✅ Products table');
@@ -63,7 +63,7 @@ db.exec(`
 `);
 console.log('✅ Purchases table');
 
-// 5. SALES TABLE
+// 5. SALES TABLE — total_amount aur GST add kiye
 db.exec(`
   CREATE TABLE IF NOT EXISTS sales (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -72,6 +72,8 @@ db.exec(`
     quantity INTEGER NOT NULL,
     price REAL NOT NULL,
     sale_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    total_amount REAL,
+    GST TEXT,
     FOREIGN KEY (customer_id) REFERENCES customers(id),
     FOREIGN KEY (product_id) REFERENCES products(id)
   )
@@ -91,7 +93,7 @@ db.exec(`
 `);
 console.log('✅ Invoices table');
 
-// 7. TRANSACTIONS TABLE
+// 7. TRANSACTIONS TABLE — Quantity add kiya
 db.exec(`
   CREATE TABLE IF NOT EXISTS transactions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -100,22 +102,24 @@ db.exec(`
     amount REAL NOT NULL,
     description TEXT,
     transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    Quantity INTEGER,
     FOREIGN KEY (invoice_id) REFERENCES invoices(id)
   )
 `);
-console.log('✅ Transactions table ');
+console.log('✅ Transactions table');
 
-// 8. user table
+// 8. USERS TABLE
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
     email TEXT UNIQUE,
-    password TEXT
+    password TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )
 `);
-console.log("✅ Users table ready");
+console.log('✅ Users table');
+
+console.log('✅ All tables ready!');
 
 module.exports = db;
-console.log('');
-console.log('Tables created successfully! Database setup complete.');

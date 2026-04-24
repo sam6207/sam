@@ -2,18 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const PORT = 3000;
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const speakeasy = require("speakeasy");
-const bodyParser = require("body-parser");
 
-// Enable CORS for all routes
 
 app.use(cors());
-app.use(bodyParser.json());
-
 app.use(express.json());
-
 
 const customerRouter = require("./router/customers.js");
 app.use("/customers", customerRouter);
@@ -29,6 +21,9 @@ app.use("/invoices", invoiceRouter);
 
 const transactionRouter = require("./router/transaction.js");
 app.use("/transactions", transactionRouter);
+
+const usersRouter = require('./router/users');
+app.use('/api/users', usersRouter);
 
 const productRouter = require("./router/product.js");
 app.use("/products", productRouter);
@@ -48,16 +43,6 @@ app.get("/", (req, res) => {
 app.use((req, res) => {
     res.status(404).json({ error: "Route not found" });
 });
-
-
-let users = [
-  {
-    id: 1,
-    username: "testuser",
-    passwordHash: bcrypt.hashSync("password123", 10),
-    twoFASecret: speakeasy.generateSecret().base32,
-  },
-];
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

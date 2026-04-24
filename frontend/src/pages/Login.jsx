@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./Auth.css";
 
 export default function Login() {
-  const [form, setForm] = useState({ username: "", password: "" });
+  const [form, setForm] = useState({ email:"", password: "" });
   const [popup, setPopup] = useState({ show: false, message: "", type: "" });
   const navigate = useNavigate();
 
@@ -15,8 +15,8 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.username.trim()) {
-      showPopup("Username is required!");
+    if (!form.email.trim()) {
+      showPopup("Email is required!");
       return;
     }
     if (form.password.length < 5) {
@@ -25,7 +25,7 @@ export default function Login() {
     }
 
     try {
-      const res = await fetch("http://localhost:3001/auth/login", {
+      const res = await fetch("http://localhost:3000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -33,11 +33,12 @@ export default function Login() {
       const data = await res.json();
 
       if (res.ok) {
-        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
         showPopup("Login successful! Redirecting...", "success");
         setTimeout(() => navigate("/dashboard"), 1200);
       } else {
-        showPopup(data.error || "Wrong username or password!");
+        showPopup(data.error || "Wrong email or password!");
       }
     } catch {
       showPopup("Could not connect to server. Is the backend running?");
@@ -68,12 +69,12 @@ export default function Login() {
 
         <form onSubmit={handleSubmit}>
           <div className="field">
-            <label>Username</label>
+            <label>Email</label>
             <input
-              type="text"
-              value={form.username}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
-              placeholder="Enter your username"
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              placeholder="Enter your email"
             />
           </div>
           <div className="field">

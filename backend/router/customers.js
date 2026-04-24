@@ -2,55 +2,67 @@ const express = require("express");
 const router = express.Router();
 const db = require("../setup.js");
 
+// GET all customers
 router.get("/", (req, res) => {
-  db.all("SELECT * FROM customers", [], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
+  try {
+    const rows = db.prepare("SELECT * FROM customers").all();
     res.json(rows);
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
+// GET single customer
 router.get("/:id", (req, res) => {
-  const { id } = req.params;
-  db.get("SELECT * FROM customers WHERE id=?", [id], (err, row) => {
-    if (err) return res.status(500).json({ error: err.message });
+  try {
+    const row = db.prepare("SELECT * FROM customers WHERE id = ?").get(req.params.id);
     if (!row) return res.status(404).json({ message: "Customer not found" });
     res.json(row);
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
+// POST new customer
 router.post("/", (req, res) => {
-  const { name, email, phone , address} = req.body;
-  db.run(
-    "INSERT INTO customers (name, email, phone, address, buyer) VALUES (?, ?, ?, ?, ?)",
-    [name, email, phone, address, buyer],
-    function (err) {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ id: this.lastID, name, email, phone, address, buyer });
-    }
-  );
+  try {
+    const { name, email, phone, address } = req.body;
+    if (!name) return res.status(400).json({ error: "Name is required" });
+
+    const result = db.prepare(
+      "INSERT INTO customers (name, email, phone, address) VALUES (?, ?, ?, ?)"
+    ).run(name, email || null, phone || null, address || null);
+
+    res.json({ id: result.lastInsertRowid, name, email, phone, address });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
+// PUT update customer
 router.put("/:id", (req, res) => {
-  const { id } = req.params;
-  const { name, email, phone, address, buyer } = req.body;
-  db.run(
-    "UPDATE customers SET name=?, email=?, phone=?, address=?, buyer=? WHERE id=?",
-    [name, email, phone, address, buyer, id],
-    function (err) {
-      if (err) return res.status(500).json({ error: err.message });
-      if (this.changes === 0) return res.status(404).json({ message: "Customer not found" });
-      res.json({ message: "Customer updated successfully" });
-    }
-  );
+  try {
+    const { name, email, phone, address } = req.body;
+    const result = db.prepare(
+      "UPDATE customers SET name=?, email=?, phone=?, address=? WHERE id=?"
+    ).run(name, email || null, phone || null, address || null, req.params.id);
+
+    if (result.changes === 0) return res.status(404).json({ message: "Customer not found" });
+    res.json({ message: "Customer updated successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
+// DELETE customer
 router.delete("/:id", (req, res) => {
-  const { id } = req.params;
-  db.run("DELETE FROM customers WHERE id=?", [id], function (err) {
-    if (err) return res.status(500).json({ error: err.message });
-    if (this.changes === 0) return res.status(404).json({ message: "Customer not found" });
+  try {
+    const result = db.prepare("DELETE FROM customers WHERE id=?").run(req.params.id);
+    if (result.changes === 0) return res.status(404).json({ message: "Customer not found" });
     res.json({ message: "Customer deleted successfully" });
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;

@@ -5,12 +5,12 @@ const db = require("../setup");
 
 //  CREATE Transaction
 router.post("/", (req, res) => {
-    const { invoice_id, type, amount, description, transaction_date } = req.body;
+    const { invoice_id, type, amount, description, transaction_date, Quantity } = req.body;
 
     db.prepare(`
-        INSERT INTO transactions (invoice_id, type, amount, description, transaction_date)
-        VALUES (?, ?, ?, ?, ?)
-    `).run(invoice_id, type, amount, description, transaction_date);
+        INSERT INTO transactions (invoice_id, type, amount, description, transaction_date, Quantity)
+        VALUES (?, ?, ?, ?, ?, ?)
+    `).run(invoice_id, type, amount, description, transaction_date, Quantity);
 
     res.send("Transaction added");
 });
@@ -39,13 +39,13 @@ router.get("/:id", (req, res) => {
 //  UPDATE Transaction
 router.put("/:id", (req, res) => {
     const { id } = req.params;
-    const { invoice_id, type, amount, description, transaction_date } = req.body;
+    const { invoice_id, type, amount, description, transaction_date, Quantity } = req.body;
 
     db.prepare(`
         UPDATE transactions
-        SET invoice_id = ?, type = ?, amount = ?, description = ?, transaction_date = ?
+        SET invoice_id = ?, type = ?, amount = ?, description = ?, transaction_date = ?, Quantity = ?
         WHERE id = ?
-    `).run(invoice_id, type, amount, description, transaction_date, id);
+    `).run(invoice_id, type, amount, description, transaction_date, Quantity, id);
 
     res.send("Transaction updated");
 });

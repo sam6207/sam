@@ -1,39 +1,69 @@
 const express = require("express");
 const router = express.Router();
-const db = require("./setup.js");
+const db = require("../setup");
 
-// ✅ SIGNUP
+// SIGNUP
 router.post("/signup", (req, res) => {
-  const { name, email, password } = req.body;
-
   try {
-    const stmt = db.prepare(
-      "INSERT INTO users (name, email, password) VALUES (?, ?, ?)"
-    );
-    stmt.run(name, email, password);
-    res.json({ message: "Signup successful" });
+    const { name, email, password } = req.body;
+    if (!name || !email || !password)
+      return res.status(400).json({ error: "name, email, password required" });
+
+    db.prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)")
+      .run(name, email, password);
+    res.json({ success: true, message: "Signup successful" });
   } catch (err) {
-    res.json({ message: "User already exists" });
+    res.status(400).json({ error: "User already exists" });
   }
 });
 
-// ✅ LOGIN
+// LOGIN
 router.post("/login", (req, res) => {
-  const { email, password } = req.body;
-
   try {
-    const stmt = db.prepare(
-      "SELECT * FROM users WHERE email = ? AND password = ?"
-    );
-    const user = stmt.get(email, password);
-
+    const { email, password } = req.body;
+    const user = db.prepare("SELECT * FROM users WHERE email = ? AND password = ?").get(email, password);
     if (user) {
-      res.json({ message: "Login successful", user });
+      res.json({ success: true, message: "Login successful", user });
     } else {
-      res.json({ message: "Invalid credentials" });
+      res.status(401).json({ error: "Invalid credentials" });
     }
   } catch (err) {
-    res.json({ message: "Error occurred" });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET ALL USERS
+router.get("/users", (req, res) => {
+  try {
+    const data = db.prepare("SELECT id, name, email, created_at FROM users").all();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ADD USER directly (Users page se)
+router.post("/users", (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    if (!name || !email || !password)
+      return res.status(400).json({ error: "name, email, password required" });
+
+    const result = db.prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)")
+      .run(name, email, password);
+    res.json({ success: true, id: result.lastInsertRowid, message: "User added" });
+  } catch (err) {
+    res.status(400).json({ error: "Email already exists" });
+  }
+});
+
+// DELETE USER
+router.delete("/users/:id", (req, res) => {
+  try {
+    db.prepare("DELETE FROM users WHERE id = ?").run(req.params.id);
+    res.json({ success: true, message: "User deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

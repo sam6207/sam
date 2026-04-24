@@ -1,0 +1,39 @@
+// ─── API HELPER (FIXED) ───────────────────────────────────────────────────────
+// Pehle r.json() directly call karte the — agar server HTML return kare (500 error)
+// toh "Unexpected token '<'" error aata tha. Ab properly handle kiya hai.
+
+const BASE_URL = "http://localhost:3000";
+
+const api = {
+  get: async (path) => {
+    const r = await fetch(`${BASE_URL}${path}`);
+    if (!r.ok) {
+      const text = await r.text();
+      try { throw new Error(JSON.parse(text).error || `HTTP ${r.status}`); }
+      catch { throw new Error(`Server error ${r.status}`); }
+    }
+    return r.json();
+  },cd
+
+  post: async (path, body) => {
+    const r = await fetch(`${BASE_URL}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const text = await r.text();
+    let data;
+    try { data = JSON.parse(text); }
+    catch { throw new Error("Server ne invalid response diya: " + text.slice(0, 100)); }
+
+    if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
+    return data;
+  },
+
+  delete: async (path) => {
+    const r = await fetch(`${BASE_URL}${path}`, { method: "DELETE" });
+    const text = await r.text();
+    try { return JSON.parse(text); }
+    catch { return { message: text }; }
+  },
+};

@@ -2,63 +2,71 @@ const express = require("express");
 const router = express.Router();
 const db = require("../setup");
 
-
-//  CREATE Vendor
+// CREATE Vendor
 router.post("/", (req, res) => {
-    const { name, phone, email, address, GST, Vendor_ID , date} = req.body; 
+  try {
+    const { name, phone, email, address } = req.body;
 
     if (!name) {
-        return res.status(400).json({ error: "Name is required" });
+      return res.status(400).json({ error: "Name is required" });
     }
 
-    db.prepare(`
-        INSERT INTO vendors (name, phone, email, address, GST, Vendor_ID, date, rate) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(name, phone || null, email || null, address || null, GST || null, Vendor_ID || null, date || null, rate || null);
+    const result = db.prepare(`
+      INSERT INTO vendors (name, phone, email, address)
+      VALUES (?, ?, ?, ?)
+    `).run(name, phone || null, email || null, address || null);
 
-    res.json({ success: true, message: "Vendor added" }); 
+    res.json({ success: true, id: result.lastInsertRowid, message: "Vendor added" });
+  } catch (err) {
+    console.error("Vendor POST error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
 });
 
-
-//  READ All Vendors
+// READ All Vendors
 router.get("/", (req, res) => {
+  try {
     const data = db.prepare("SELECT * FROM vendors").all();
     res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
-
 
 // READ Single Vendor
 router.get("/:id", (req, res) => {
-    const { id } = req.params;
-
-    const data = db.prepare("SELECT * FROM vendors WHERE id=?")
-                   .get(id);
-
+  try {
+    const data = db.prepare("SELECT * FROM vendors WHERE id = ?").get(req.params.id);
+    if (!data) return res.status(404).json({ message: "Vendor not found" });
     res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-
-//  UPDATE Vendor
+// UPDATE Vendor
 router.put("/:id", (req, res) => {
-    const { id } = req.params;
-    const { name, contact } = req.body;
+  try {
+    const { name, phone, email, address } = req.body;
+    const result = db.prepare(`
+      UPDATE vendors SET name = ?, phone = ?, email = ?, address = ? WHERE id = ?
+    `).run(name, phone || null, email || null, address || null, req.params.id);
 
-    db.prepare("UPDATE vendors SET name=?, contact=? WHERE id=?")
-      .run(name, contact, id);
-
-    res.send("Vendor updated");
+    if (result.changes === 0) return res.status(404).json({ message: "Vendor not found" });
+    res.json({ message: "Vendor updated" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-
-//  DELETE Vendor
+// DELETE Vendor
 router.delete("/:id", (req, res) => {
-    const { id } = req.params;
-
-    db.prepare("DELETE FROM vendors WHERE id=?")
-      .run(id);
-
-    res.send("Vendor deleted");
+  try {
+    db.prepare("DELETE FROM vendors WHERE id = ?").run(req.params.id);
+    res.json({ message: "Vendor deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
-
 
 module.exports = router;
