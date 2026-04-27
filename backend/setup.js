@@ -31,7 +31,6 @@ db.exec(`
 `);
 console.log('✅ Customers table');
 
-// 3. PRODUCTS TABLE — status aur category add kiye
 db.exec(`
   CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -48,7 +47,6 @@ db.exec(`
 `);
 console.log('✅ Products table');
 
-// 4. PURCHASES TABLE
 db.exec(`
   CREATE TABLE IF NOT EXISTS purchases (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -63,7 +61,6 @@ db.exec(`
 `);
 console.log('✅ Purchases table');
 
-// 5. SALES TABLE — total_amount aur GST add kiye
 db.exec(`
   CREATE TABLE IF NOT EXISTS sales (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -80,7 +77,6 @@ db.exec(`
 `);
 console.log('✅ Sales table');
 
-// 6. INVOICES TABLE
 db.exec(`
   CREATE TABLE IF NOT EXISTS invoices (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -93,7 +89,6 @@ db.exec(`
 `);
 console.log('✅ Invoices table');
 
-// 7. TRANSACTIONS TABLE — Quantity add kiya
 db.exec(`
   CREATE TABLE IF NOT EXISTS transactions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -108,7 +103,6 @@ db.exec(`
 `);
 console.log('✅ Transactions table');
 
-// 8. USERS TABLE
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

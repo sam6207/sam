@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
+import SalesLineChart from "./SalesLineChart"; 
 import {
   LayoutDashboard, Package, Users, ShoppingCart, Tag,
   Store, UserCircle, Bell, Search,
   Plus, LogOut, Boxes, Trash2, X
 } from "lucide-react";
 
-// ─── API HELPER ───────────────────────────────────────────────────────────────
+//  API HELPER 
 const BASE_URL = "http://localhost:3000";
 
 const api = {
@@ -17,8 +18,7 @@ const api = {
   }).then(r => r.json()),
   delete: (path)       => fetch(`${BASE_URL}${path}`, { method: "DELETE" }).then(r => r.json()),
 };
-
-// ─── REUSABLE COMPONENTS ─────────────────────────────────────────────────────
+// REUSABLE COMPONENTS 
 function Card({ children, style }) {
   return (
     <div style={{
@@ -32,7 +32,6 @@ function Card({ children, style }) {
     </div>
   );
 }
-
 function Btn({ children, onClick, ghost, icon: Icon, full }) {
   return (
     <button onClick={onClick} style={{
@@ -47,7 +46,6 @@ function Btn({ children, onClick, ghost, icon: Icon, full }) {
     </button>
   );
 }
-
 function Field({ label, id, ...props }) {
   return (
     <div style={{ marginBottom: 14 }}>
@@ -65,7 +63,6 @@ function Field({ label, id, ...props }) {
     </div>
   );
 }
-
 function Modal({ title, onClose, children }) {
   return (
     <div style={{
@@ -89,7 +86,7 @@ function Modal({ title, onClose, children }) {
   );
 }
 
-// Loading & Error states
+// Error
 function LoadingRow({ cols }) {
   return (
     <tr>
@@ -99,7 +96,6 @@ function LoadingRow({ cols }) {
     </tr>
   );
 }
-
 function ErrorRow({ cols, message }) {
   return (
     <tr>
@@ -109,7 +105,6 @@ function ErrorRow({ cols, message }) {
     </tr>
   );
 }
-
 function EntityTable({ columns, rows, onDelete, loading, error }) {
   return (
     <div style={{ overflowX: "auto" }}>
@@ -162,15 +157,9 @@ function EntityTable({ columns, rows, onDelete, loading, error }) {
     </div>
   );
 }
-
-// ════════════════════════════════════════════════════════════════════════════
-//  PAGES
-// ════════════════════════════════════════════════════════════════════════════
-
-// ─── DASHBOARD ───────────────────────────────────────────────────────────────
+// DASHBOARD 
 function DashboardPage() {
-  const [stats, setStats] = useState({ products: 0, vendors: 0, customers: 0, sales: 0 });
-
+  const [stats, setStats] = useState({ products: 0, vendors: 0, customers: 0, sales: 0 });  
   useEffect(() => {
     // Fetch counts from all APIs
     Promise.all([
@@ -208,11 +197,11 @@ function DashboardPage() {
           </Card>
         ))}
       </div>
+      <SalesLineChart />
     </div>
   );
 }
-
-// ─── PRODUCTS ────────────────────────────────────────────────────────────────
+// PRODUCTS
 function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -234,9 +223,7 @@ function ProductsPage() {
         setLoading(false);
       });
   }, []);
-
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
-
   // POST new product
   const add = () => {
     if (!form.name || !form.stock) return alert("Name or Stock required");
@@ -254,7 +241,6 @@ function ProductsPage() {
       fetchProducts(); // Refresh list
     }).catch(err => alert("Error: " + err.message));
   };
-
   // DELETE product
   const deleteProduct = (id) => {
     if (!window.confirm("Delete")) return;
@@ -262,7 +248,6 @@ function ProductsPage() {
       .then(() => fetchProducts())
       .catch(err => alert("Error: " + err.message));
   };
-
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
@@ -304,8 +289,7 @@ function ProductsPage() {
   );
 }
 
-// ─── GENERIC API PAGE ─────────────────────────────────────────────────────────
-// Reusable page: fetch from apiPath, show fields, POST on add, DELETE by id
+// GENERIC API Page
 function ApiPage({ title, apiPath, fields, columns }) {
   const [items, setItems]   = useState([]);
   const [loading, setLoading] = useState(true);
@@ -322,7 +306,6 @@ function ApiPage({ title, apiPath, fields, columns }) {
   }, [apiPath]);
 
   useEffect(() => { fetchItems(); }, [fetchItems]);
-
   const add = () => {
     const required = fields.filter(f => f.required);
     if (required.some(f => !vals[f.id])) {
@@ -376,7 +359,7 @@ function ApiPage({ title, apiPath, fields, columns }) {
   );
 }
 
-// ─── CATEGORIES (local only — no backend route) ───────────────────────────────
+// CATEGORIES (local only — no backend route) 
 function CategoriesPage() {
   const [cats, setCats] = useState(["Tech", "Fashion"]);
   const [val, setVal]   = useState("");
@@ -424,9 +407,7 @@ function CategoriesPage() {
   );
 }
 
-// ════════════════════════════════════════════════════════════════════════════
 //  NAV CONFIG
-// ════════════════════════════════════════════════════════════════════════════
 const NAV = [
   { id: "dashboard",   label: "Dashboard",   Icon: LayoutDashboard },
   { id: "products",    label: "Products",    Icon: Package          },
@@ -439,22 +420,47 @@ const NAV = [
   { id: "Sales",       label: "Sales",       Icon: ShoppingCart     },
   { id: "Transaction", label: "Transaction", Icon: ShoppingCart     },
 ];
-
-// ════════════════════════════════════════════════════════════════════════════
 //  MAIN APP
-// ════════════════════════════════════════════════════════════════════════════
 export default function App() {
   const [page, setPage]     = useState("dashboard");
   const [search, setSearch] = useState("");
+  const [searchResults, setSearchResults] = useState([]);   // ← ADD
+  const [showResults, setShowResults]     = useState(false); // ← ADD
+  // User localStorage 
+  const [currentUser,] = useState(() => {    
+    try { return JSON.parse(localStorage.getItem("user")) || null; }
+    catch { return null; }
+  });
+  const getInitials = (name) => {                           // ← ADD
+    if (!name) return "U";
+    return name.trim().split(" ").slice(0, 2).map(w => w[0].toUpperCase()).join("");
+  };
 
+  // Search function
+  const handleSearch = async (val) => {                     // ← ADD
+    setSearch(val);
+    if (!val.trim()) { setSearchResults([]); setShowResults(false); return; }
+    try {
+      const [products, vendors, customers] = await Promise.all([
+        api.get("/products"),
+        api.get("/vendors"),
+        api.get("/customers"),
+      ]);
+      const q = val.toLowerCase();
+      const results = [
+        ...products.filter(p => p.name?.toLowerCase().includes(q)).map(p => ({ ...p, _type: "Product" })),
+        ...vendors.filter(v  => v.name?.toLowerCase().includes(q)).map(v  => ({ ...v,  _type: "Vendor"  })),
+        ...customers.filter(c => c.name?.toLowerCase().includes(q)).map(c => ({ ...c, _type: "Customer" })),
+      ];
+      setSearchResults(results);
+      setShowResults(true);
+    } catch (err) { console.error(err); }
+  };
   const renderPage = () => {
     switch (page) {
-
       case "dashboard": return <DashboardPage />;
-
       case "products":  return <ProductsPage />;
-
-      // ── VENDORS ──────────────────────────────────────────────────────────
+      // VENDORS 
       case "vendors": return (
         <ApiPage
           title="Vendors" apiPath="/vendors"
@@ -467,8 +473,7 @@ export default function App() {
           ]}
         />
       );
-
-      // ── USERS ─────────────────────────────────────────────────────────────
+      // USERS 
       case "users": return (
         <ApiPage
           title="Users" apiPath="/auth/users"
@@ -480,8 +485,7 @@ export default function App() {
           ]}
         />
       );
-
-      // ── CUSTOMERS ─────────────────────────────────────────────────────────
+      //  CUSTOMERS 
       case "customers": return (
         <ApiPage
           title="Customers" apiPath="/customers"
@@ -494,8 +498,7 @@ export default function App() {
           ]}
         />
       );
-
-      // ── PURCHASE ──────────────────────────────────────────────────────────
+      //  PURCHASE 
       case "purchase": return (
         <ApiPage
           title="Purchases" apiPath="/purchases"
@@ -509,8 +512,7 @@ export default function App() {
           ]}
         />
       );
-
-      // ── INVOICES ──────────────────────────────────────────────────────────
+      // INVOICES 
       case "Invoices": return (
         <ApiPage
           title="Invoices" apiPath="/invoices"
@@ -523,8 +525,7 @@ export default function App() {
           ]}
         />
       );
-
-      // ── SALES ─────────────────────────────────────────────────────────────
+      //  SALES 
       case "Sales": return (
         <ApiPage
           title="Sales" apiPath="/sales"
@@ -540,8 +541,7 @@ export default function App() {
           ]}
         />
       );
-
-      // ── TRANSACTIONS ──────────────────────────────────────────────────────
+      // TRANSACTIONS 
       case "Transaction": return (
         <ApiPage
           title="Transactions" apiPath="/transactions"
@@ -555,23 +555,18 @@ export default function App() {
           ]}
         />
       );
-
       case "categories": return <CategoriesPage />;
       default:           return <DashboardPage />;
     }
   };
-
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#0f1117" }}>
-
-      {/* ── SIDEBAR ── */}
       <div style={{
         width: 220, background: "#161b27",
         borderRight: "1px solid rgba(255,255,255,0.06)",
         display: "flex", flexDirection: "column", flexShrink: 0,
         position: "sticky", top: 0, height: "100vh",
       }}>
-        {/* Logo */}
         <div style={{
           padding: "20px 20px 16px",
           borderBottom: "1px solid rgba(255,255,255,0.06)",
@@ -585,8 +580,6 @@ export default function App() {
           </div>
           <span style={{ fontFamily: "'Syne',sans-serif", fontSize: 17, fontWeight: 700, color: "#fff" }}>StockIQ</span>
         </div>
-
-        {/* Nav Links */}
         <nav style={{ flex: 1, padding: "12px 8px", overflowY: "auto" }}>
           <div style={{ fontSize: 10, color: "#475569", textTransform: "uppercase", letterSpacing: "1.2px", padding: "6px 10px 8px" }}>Main</div>
           {NAV.map(({ id, label, Icon, badge }) => (
@@ -617,46 +610,79 @@ export default function App() {
             </button>
           ))}
         </nav>
-
-        {/* Logout */}
         <div style={{ padding: "12px" }}>
-          <button style={{
+          <button 
+             onClick={() => {localStorage.removeItem("user"); 
+              window.location.href = "/login";
+             }}
+             style={{
             width: "100%", display: "flex", alignItems: "center", gap: 8,
             background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)",
             borderRadius: 10, padding: "10px 14px", color: "#94a3b8",
             fontFamily: "'DM Sans',sans-serif", fontSize: 13, cursor: "pointer",
           }}>
             <LogOut size={14} />
-            <li onClick={() => setPage("Login")}>Logout</li>
+            Logout
           </button>
         </div>
       </div>
-
-      {/* ── MAIN AREA ── */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden" }}>
-
-        {/* Topbar */}
         <div style={{
           background: "#161b27", borderBottom: "1px solid rgba(255,255,255,0.06)",
           padding: "12px 24px", display: "flex", alignItems: "center", gap: 16,
           position: "sticky", top: 0, zIndex: 10,
         }}>
           <div style={{ flex: 1, maxWidth: 380, position: "relative" }}>
-            <Search size={14} color="#64748b" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }} />
+            <Search size={14} color="#64748b" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", zIndex: 1 }} />
             <input
-              type="search" placeholder="Search products, vendors, orders…"
-              value={search} onChange={e => setSearch(e.target.value)}
+              type="search" placeholder="Search products, vendors, customers…"
+              value={search}
+              onChange={e => handleSearch(e.target.value)}
+              onBlur={() => setTimeout(() => setShowResults(false), 200)}
+              onFocus={() => search && setShowResults(true)}
               autoComplete="off"
               style={{
                 width: "100%", background: "#1c2235",
                 border: "1px solid rgba(255,255,255,0.07)",
                 borderRadius: 9, padding: "8px 14px 8px 36px",
                 fontSize: 13.5, color: "#e2e8f0",
-                fontFamily: "'DM Sans',sans-serif", outline: "none",
+                fontFamily: "'DM Sans',sans-serif", outline: "none", boxSizing: "border-box",
               }}
             />
+            {showResults && (
+              <div style={{
+                position: "absolute", top: "110%", left: 0, right: 0,
+                background: "#1c2235", border: "1px solid rgba(255,255,255,0.1)",
+                borderRadius: 10, zIndex: 999, maxHeight: 280, overflowY: "auto",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+              }}>
+                {searchResults.length === 0 ? (
+                  <div style={{ padding: "14px 16px", color: "#64748b", fontSize: 13 }}>No results found</div>
+                ) : searchResults.map((item, i) => (
+                  <div key={i} onClick={() => {
+                    setPage(item._type === "Product" ? "products" : item._type === "Vendor" ? "vendors" : "customers");
+                    setShowResults(false); setSearch("");
+                  }} style={{
+                    padding: "10px 16px", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.05)",
+                    display: "flex", alignItems: "center", gap: 10,
+                    transition: "background 0.15s",
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = "rgba(99,102,241,0.12)"}
+                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                  >
+                    <span style={{
+                      fontSize: 10, fontWeight: 600, color: "#6366f1",
+                      background: "rgba(99,102,241,0.15)", padding: "2px 7px",
+                      borderRadius: 5, textTransform: "uppercase",
+                    }}>{item._type}</span>
+                    <span style={{ fontSize: 13, color: "#e2e8f0" }}>{item.name}</span>
+                    {item.email && <span style={{ fontSize: 11, color: "#64748b", marginLeft: "auto" }}>{item.email}</span>}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          <div style={{ marginLeft: "auto" }}>
+          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12 }}>
             <button style={{
               width: 36, height: 36, background: "#1c2235",
               border: "1px solid rgba(255,255,255,0.07)",
@@ -664,10 +690,30 @@ export default function App() {
             }}>
               <Bell size={15} color="#94a3b8" />
             </button>
+            {currentUser && (
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: "50%",
+                  background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 13, fontWeight: 700, color: "#fff",
+                  border: "2px solid rgba(99,102,241,0.4)",
+                  flexShrink: 0,
+                }}>
+                  {getInitials(currentUser.name)}
+                </div>
+                <div style={{ lineHeight: 1.3 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#e2e8f0" }}>
+                    {currentUser.name}
+                  </div>
+                  <div style={{ fontSize: 11, color: "#64748b" }}>
+                    {currentUser.email}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Page Content */}
         <div style={{ flex: 1, padding: 24, overflowY: "auto" }}>
           {renderPage()}
         </div>

@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import InventoryApp from "./inventory/Inventory";
 
+
 export default function MainApp() {
   return (
     <BrowserRouter>
