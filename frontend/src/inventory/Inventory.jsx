@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
-import SalesLineChart from "./SalesLineChart"; 
+import SalesLineChart from "./SalesLineChart";
+import VendorDetailModal from "./VendorsDetails"; // ✅ IMPORT
 import {
   LayoutDashboard, Package, Users, ShoppingCart, Tag,
   Store, UserCircle, Bell, Search,
   Plus, LogOut, Boxes, Trash2, X
 } from "lucide-react";
 
-//  API HELPER 
+//  API HELPER
 const BASE_URL = "http://localhost:3000";
 
 const api = {
@@ -18,7 +19,8 @@ const api = {
   }).then(r => r.json()),
   delete: (path)       => fetch(`${BASE_URL}${path}`, { method: "DELETE" }).then(r => r.json()),
 };
-// REUSABLE COMPONENTS 
+
+// REUSABLE COMPONENTS
 function Card({ children, style }) {
   return (
     <div style={{
@@ -32,6 +34,7 @@ function Card({ children, style }) {
     </div>
   );
 }
+
 function Btn({ children, onClick, ghost, icon: Icon, full }) {
   return (
     <button onClick={onClick} style={{
@@ -46,6 +49,7 @@ function Btn({ children, onClick, ghost, icon: Icon, full }) {
     </button>
   );
 }
+
 function Field({ label, id, ...props }) {
   return (
     <div style={{ marginBottom: 14 }}>
@@ -63,6 +67,7 @@ function Field({ label, id, ...props }) {
     </div>
   );
 }
+
 function Modal({ title, onClose, children }) {
   return (
     <div style={{
@@ -86,7 +91,6 @@ function Modal({ title, onClose, children }) {
   );
 }
 
-// Error
 function LoadingRow({ cols }) {
   return (
     <tr>
@@ -96,6 +100,7 @@ function LoadingRow({ cols }) {
     </tr>
   );
 }
+
 function ErrorRow({ cols, message }) {
   return (
     <tr>
@@ -105,7 +110,9 @@ function ErrorRow({ cols, message }) {
     </tr>
   );
 }
-function EntityTable({ columns, rows, onDelete, loading, error }) {
+
+// ✅ onRowClick prop add kiya
+function EntityTable({ columns, rows, onDelete, loading, error, onRowClick }) {
   return (
     <div style={{ overflowX: "auto" }}>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
@@ -136,17 +143,32 @@ function EntityTable({ columns, rows, onDelete, loading, error }) {
               </td>
             </tr>
           ) : rows.map((row, i) => (
-            <tr key={row.id || i} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+            // ✅ Puri row clickable hai - vendor click karne par modal khulega
+            <tr
+              key={row.id || i}
+              onClick={() => onRowClick && onRowClick(row)}
+              style={{
+                borderBottom: "1px solid rgba(255,255,255,0.04)",
+                cursor: onRowClick ? "pointer" : "default",
+                transition: "background 0.15s",
+              }}
+              onMouseEnter={e => { if (onRowClick) e.currentTarget.style.background = "rgba(99,102,241,0.07)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+            >
               {columns.map((col) => (
                 <td key={col} style={{ padding: "11px 12px", color: "#e2e8f0" }}>
                   {row[col.toLowerCase()] ?? row[col] ?? "—"}
                 </td>
               ))}
               <td style={{ padding: "11px 12px", textAlign: "right" }}>
-                <button onClick={() => onDelete(row.id || i)} style={{
-                  background: "rgba(244,63,94,.12)", border: "none",
-                  borderRadius: 6, padding: "4px 8px", color: "#f43f5e", cursor: "pointer",
-                }}>
+                {/* ✅ e.stopPropagation() - delete button click karne par row ka onClick na chale */}
+                <button
+                  onClick={e => { e.stopPropagation(); onDelete(row.id || i); }}
+                  style={{
+                    background: "rgba(244,63,94,.12)", border: "none",
+                    borderRadius: 6, padding: "4px 8px", color: "#f43f5e", cursor: "pointer",
+                  }}
+                >
                   <Trash2 size={13} />
                 </button>
               </td>
@@ -157,11 +179,11 @@ function EntityTable({ columns, rows, onDelete, loading, error }) {
     </div>
   );
 }
-// DASHBOARD 
+
+// DASHBOARD
 function DashboardPage() {
-  const [stats, setStats] = useState({ products: 0, vendors: 0, customers: 0, sales: 0 });  
+  const [stats, setStats] = useState({ products: 0, vendors: 0, customers: 0, sales: 0 });
   useEffect(() => {
-    // Fetch counts from all APIs
     Promise.all([
       api.get("/products"),
       api.get("/vendors"),
@@ -169,10 +191,10 @@ function DashboardPage() {
       api.get("/sales"),
     ]).then(([products, vendors, customers, sales]) => {
       setStats({
-        products: Array.isArray(products) ? products.length : 0,
-        vendors:  Array.isArray(vendors)  ? vendors.length  : 0,
-        customers:Array.isArray(customers)? customers.length: 0,
-        sales:    Array.isArray(sales)    ? sales.length    : 0,
+        products:  Array.isArray(products)  ? products.length  : 0,
+        vendors:   Array.isArray(vendors)   ? vendors.length   : 0,
+        customers: Array.isArray(customers) ? customers.length : 0,
+        sales:     Array.isArray(sales)     ? sales.length     : 0,
       });
     }).catch(err => console.error("Dashboard fetch error:", err));
   }, []);
@@ -201,6 +223,7 @@ function DashboardPage() {
     </div>
   );
 }
+
 // PRODUCTS
 function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -209,22 +232,16 @@ function ProductsPage() {
   const [modal, setModal]       = useState(false);
   const [form, setForm]         = useState({});
 
-  // GET all products
   const fetchProducts = useCallback(() => {
     setLoading(true);
     setError(null);
     api.get("/products")
-      .then(data => {
-        setProducts(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError(err.message);
-        setLoading(false);
-      });
+      .then(data => { setProducts(Array.isArray(data) ? data : []); setLoading(false); })
+      .catch(err => { setError(err.message); setLoading(false); });
   }, []);
+
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
-  // POST new product
+
   const add = () => {
     if (!form.name || !form.stock) return alert("Name or Stock required");
     api.post("/products", {
@@ -235,19 +252,17 @@ function ProductsPage() {
       vendor_id:   form.vendor_id || null,
       category:    form.category || "",
       status:      "active",
-    }).then(() => {
-      setModal(false);
-      setForm({});
-      fetchProducts(); // Refresh list
-    }).catch(err => alert("Error: " + err.message));
+    }).then(() => { setModal(false); setForm({}); fetchProducts(); })
+      .catch(err => alert("Error: " + err.message));
   };
-  // DELETE product
+
   const deleteProduct = (id) => {
     if (!window.confirm("Delete")) return;
     api.delete(`/products/${id}`)
       .then(() => fetchProducts())
       .catch(err => alert("Error: " + err.message));
   };
+
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
@@ -289,13 +304,13 @@ function ProductsPage() {
   );
 }
 
-// GENERIC API Page
-function ApiPage({ title, apiPath, fields, columns }) {
-  const [items, setItems]   = useState([]);
+// ✅ onRowClick prop add kiya ApiPage mein
+function ApiPage({ title, apiPath, fields, columns, onRowClick }) {
+  const [items, setItems]     = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError]   = useState(null);
-  const [modal, setModal]   = useState(false);
-  const [vals, setVals]     = useState({});
+  const [error, setError]     = useState(null);
+  const [modal, setModal]     = useState(false);
+  const [vals, setVals]       = useState({});
 
   const fetchItems = useCallback(() => {
     setLoading(true);
@@ -306,6 +321,7 @@ function ApiPage({ title, apiPath, fields, columns }) {
   }, [apiPath]);
 
   useEffect(() => { fetchItems(); }, [fetchItems]);
+
   const add = () => {
     const required = fields.filter(f => f.required);
     if (required.some(f => !vals[f.id])) {
@@ -333,10 +349,12 @@ function ApiPage({ title, apiPath, fields, columns }) {
         <Btn icon={Plus} onClick={() => setModal(true)}>Add {title.replace(/s$/, "")}</Btn>
       </div>
       <Card>
+        {/* ✅ onRowClick EntityTable ko pass ho raha hai */}
         <EntityTable
           columns={columns}
           rows={items}
           onDelete={deleteItem}
+          onRowClick={onRowClick}
           loading={loading}
           error={error}
         />
@@ -359,7 +377,7 @@ function ApiPage({ title, apiPath, fields, columns }) {
   );
 }
 
-// CATEGORIES (local only — no backend route) 
+// CATEGORIES
 function CategoriesPage() {
   const [cats, setCats] = useState(["Tech", "Fashion"]);
   const [val, setVal]   = useState("");
@@ -407,7 +425,7 @@ function CategoriesPage() {
   );
 }
 
-//  NAV CONFIG
+// NAV CONFIG
 const NAV = [
   { id: "dashboard",   label: "Dashboard",   Icon: LayoutDashboard },
   { id: "products",    label: "Products",    Icon: Package          },
@@ -420,24 +438,28 @@ const NAV = [
   { id: "Sales",       label: "Sales",       Icon: ShoppingCart     },
   { id: "Transaction", label: "Transaction", Icon: ShoppingCart     },
 ];
-//  MAIN APP
+
+// MAIN APP
 export default function App() {
-  const [page, setPage]     = useState("dashboard");
-  const [search, setSearch] = useState("");
-  const [searchResults, setSearchResults] = useState([]);   // ← ADD
-  const [showResults, setShowResults]     = useState(false); // ← ADD
-  // User localStorage 
-  const [currentUser,] = useState(() => {    
+  const [page, setPage]                   = useState("dashboard");
+  const [search, setSearch]               = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showResults, setShowResults]     = useState(false);
+
+  // ✅ YEH STATE - vendor row click karne par set hogi, modal khulega
+  const [selectedVendor, setSelectedVendor] = useState(null);
+
+  const [currentUser,] = useState(() => {
     try { return JSON.parse(localStorage.getItem("user")) || null; }
     catch { return null; }
   });
-  const getInitials = (name) => {                           // ← ADD
+
+  const getInitials = (name) => {
     if (!name) return "U";
     return name.trim().split(" ").slice(0, 2).map(w => w[0].toUpperCase()).join("");
   };
 
-  // Search function
-  const handleSearch = async (val) => {                     // ← ADD
+  const handleSearch = async (val) => {
     setSearch(val);
     if (!val.trim()) { setSearchResults([]); setShowResults(false); return; }
     try {
@@ -456,15 +478,18 @@ export default function App() {
       setShowResults(true);
     } catch (err) { console.error(err); }
   };
+
   const renderPage = () => {
     switch (page) {
       case "dashboard": return <DashboardPage />;
       case "products":  return <ProductsPage />;
-      // VENDORS 
+
+      // ✅ VENDORS - row click hone par setSelectedVendor call hoga → modal open
       case "vendors": return (
         <ApiPage
           title="Vendors" apiPath="/vendors"
           columns={["id", "name", "phone", "email", "address", "created_at"]}
+          onRowClick={(vendor) => setSelectedVendor(vendor)}
           fields={[
             { id: "name",    label: "Vendor Name*", placeholder: "e.g. Reliance", required: true },
             { id: "phone",   label: "Phone",         placeholder: "+91 98765..." },
@@ -472,8 +497,8 @@ export default function App() {
             { id: "address", label: "Address",       placeholder: "123 Main St" },
           ]}
         />
-      ); 
-      // USERS 
+      );
+
       case "users": return (
         <ApiPage
           title="Users" apiPath="/auth/users"
@@ -485,7 +510,7 @@ export default function App() {
           ]}
         />
       );
-      //  CUSTOMERS 
+
       case "customers": return (
         <ApiPage
           title="Customers" apiPath="/customers"
@@ -498,7 +523,7 @@ export default function App() {
           ]}
         />
       );
-      //  PURCHASE 
+
       case "purchase": return (
         <ApiPage
           title="Purchases" apiPath="/purchases"
@@ -512,7 +537,7 @@ export default function App() {
           ]}
         />
       );
-      // INVOICES 
+
       case "Invoices": return (
         <ApiPage
           title="Invoices" apiPath="/invoices"
@@ -525,7 +550,7 @@ export default function App() {
           ]}
         />
       );
-      //  SALES 
+
       case "Sales": return (
         <ApiPage
           title="Sales" apiPath="/sales"
@@ -541,26 +566,30 @@ export default function App() {
           ]}
         />
       );
-      // TRANSACTIONS 
+
       case "Transaction": return (
         <ApiPage
           title="Transactions" apiPath="/transactions"
           columns={["id", "invoice_id", "type", "amount", "description", "transaction_date"]}
           fields={[
-            { id: "invoice_id",        label: "Invoice ID*",        placeholder: "e.g. 1", required: true },
-            { id: "type",              label: "Type*",              placeholder: "Sale / Purchase", required: true },
-            { id: "amount",            label: "Amount*",            placeholder: "5000", type: "number", required: true },
-            { id: "description",       label: "Description",        placeholder: "Details..." },
-            { id: "transaction_date",  label: "Transaction Date",   type: "date" },
+            { id: "invoice_id",       label: "Invoice ID*",       placeholder: "e.g. 1", required: true },
+            { id: "type",             label: "Type*",             placeholder: "Sale / Purchase", required: true },
+            { id: "amount",           label: "Amount*",           placeholder: "5000", type: "number", required: true },
+            { id: "description",      label: "Description",       placeholder: "Details..." },
+            { id: "transaction_date", label: "Transaction Date",  type: "date" },
           ]}
         />
       );
+
       case "categories": return <CategoriesPage />;
       default:           return <DashboardPage />;
     }
   };
+
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#0f1117" }}>
+
+      {/* SIDEBAR */}
       <div style={{
         width: 220, background: "#161b27",
         borderRight: "1px solid rgba(255,255,255,0.06)",
@@ -580,6 +609,7 @@ export default function App() {
           </div>
           <span style={{ fontFamily: "'Syne',sans-serif", fontSize: 17, fontWeight: 700, color: "#fff" }}>StockIQ</span>
         </div>
+
         <nav style={{ flex: 1, padding: "12px 8px", overflowY: "auto" }}>
           <div style={{ fontSize: 10, color: "#475569", textTransform: "uppercase", letterSpacing: "1.2px", padding: "6px 10px 8px" }}>Main</div>
           {NAV.map(({ id, label, Icon, badge }) => (
@@ -610,23 +640,26 @@ export default function App() {
             </button>
           ))}
         </nav>
+
         <div style={{ padding: "12px" }}>
-          <button 
-             onClick={() => {localStorage.removeItem("user"); 
-              window.location.href = "/login";
-             }}
-             style={{
-            width: "100%", display: "flex", alignItems: "center", gap: 8,
-            background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)",
-            borderRadius: 10, padding: "10px 14px", color: "#94a3b8",
-            fontFamily: "'DM Sans',sans-serif", fontSize: 13, cursor: "pointer",
-          }}>
+          <button
+            onClick={() => { localStorage.removeItem("user"); window.location.href = "/login"; }}
+            style={{
+              width: "100%", display: "flex", alignItems: "center", gap: 8,
+              background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)",
+              borderRadius: 10, padding: "10px 14px", color: "#94a3b8",
+              fontFamily: "'DM Sans',sans-serif", fontSize: 13, cursor: "pointer",
+            }}>
             <LogOut size={14} />
             Logout
           </button>
         </div>
       </div>
+
+      {/* MAIN CONTENT */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden" }}>
+
+        {/* TOPBAR */}
         <div style={{
           background: "#161b27", borderBottom: "1px solid rgba(255,255,255,0.06)",
           padding: "12px 24px", display: "flex", alignItems: "center", gap: 16,
@@ -664,11 +697,10 @@ export default function App() {
                     setShowResults(false); setSearch("");
                   }} style={{
                     padding: "10px 16px", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.05)",
-                    display: "flex", alignItems: "center", gap: 10,
-                    transition: "background 0.15s",
+                    display: "flex", alignItems: "center", gap: 10, transition: "background 0.15s",
                   }}
-                  onMouseEnter={e => e.currentTarget.style.background = "rgba(99,102,241,0.12)"}
-                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                    onMouseEnter={e => e.currentTarget.style.background = "rgba(99,102,241,0.12)"}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                   >
                     <span style={{
                       fontSize: 10, fontWeight: 600, color: "#6366f1",
@@ -682,6 +714,7 @@ export default function App() {
               </div>
             )}
           </div>
+
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12 }}>
             <button style={{
               width: 36, height: 36, background: "#1c2235",
@@ -697,27 +730,33 @@ export default function App() {
                   background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 13, fontWeight: 700, color: "#fff",
-                  border: "2px solid rgba(99,102,241,0.4)",
-                  flexShrink: 0,
+                  border: "2px solid rgba(99,102,241,0.4)", flexShrink: 0,
                 }}>
                   {getInitials(currentUser.name)}
                 </div>
                 <div style={{ lineHeight: 1.3 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "#e2e8f0" }}>
-                    {currentUser.name}
-                  </div>
-                  <div style={{ fontSize: 11, color: "#64748b" }}>
-                    {currentUser.email}
-                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#e2e8f0" }}>{currentUser.name}</div>
+                  <div style={{ fontSize: 11, color: "#64748b" }}>{currentUser.email}</div>
                 </div>
               </div>
             )}
           </div>
         </div>
+
+        {/* PAGE CONTENT */}
         <div style={{ flex: 1, padding: 24, overflowY: "auto" }}>
           {renderPage()}
         </div>
       </div>
+
+      {/* ✅ VENDOR DETAIL MODAL - vendor row click hone par yahan show hoga */}
+      {selectedVendor && (
+        <VendorDetailModal
+          vendors={selectedVendor}
+          onClose={() => setSelectedVendor(null)}
+        />
+      )}
+
     </div>
   );
 }

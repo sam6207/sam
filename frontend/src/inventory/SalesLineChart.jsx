@@ -124,7 +124,7 @@ export default function SalesLineChart() {
         </div>
       ) : data.length === 0 ? (
         <div style={{ textAlign: "center", padding: 40, color: "#64748b" }}>
-          Koi sales data nahi mila abhi
+          data is not found.
         </div>
       ) : (
         <ResponsiveContainer width="100%" height={280}>
