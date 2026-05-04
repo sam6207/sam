@@ -143,7 +143,6 @@ function EntityTable({ columns, rows, onDelete, loading, error, onRowClick }) {
               </td>
             </tr>
           ) : rows.map((row, i) => (
-            // ✅ Puri row clickable hai - vendor click karne par modal khulega
             <tr
               key={row.id || i}
               onClick={() => onRowClick && onRowClick(row)}
@@ -161,7 +160,6 @@ function EntityTable({ columns, rows, onDelete, loading, error, onRowClick }) {
                 </td>
               ))}
               <td style={{ padding: "11px 12px", textAlign: "right" }}>
-                {/* ✅ e.stopPropagation() - delete button click karne par row ka onClick na chale */}
                 <button
                   onClick={e => { e.stopPropagation(); onDelete(row.id || i); }}
                   style={{
@@ -243,12 +241,12 @@ function ProductsPage() {
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
   const add = () => {
-    if (!form.name || !form.stock) return alert("Name or Stock required");
+    if (!form.name || !form.quantity) return alert("Name or Quantity required");
     api.post("/products", {
       name:        form.name,
       description: form.description || "",
       price:       Number(form.price) || 0,
-      stock:       Number(form.stock) || 0,
+      quantity:    Number(form.quantity) || 0,
       vendor_id:   form.vendor_id || null,
       category:    form.category || "",
       status:      "active",
@@ -274,7 +272,7 @@ function ProductsPage() {
       </div>
       <Card>
         <EntityTable
-          columns={["Name", "description", "Price", "Stock", "Status", "vendor_id", "category", "Created_at"]}
+          columns={["Name", "description", "Price", "Quantity", "Status", "vendor_id", "category", "Created_at"]}
           rows={products}
           onDelete={deleteProduct}
           loading={loading}
@@ -285,7 +283,7 @@ function ProductsPage() {
         <Modal title="Add Product" onClose={() => { setModal(false); setForm({}); }}>
           {[
             { label: "Product Name*",  id: "name",        placeholder: "e.g. Basmati Rice" },
-            { label: "Stock*",         id: "stock",       placeholder: "e.g. 100",  type: "number" },
+            { label: "Quantity*",      id: "quantity",    placeholder: "e.g. 100",  type: "number" },
             { label: "Price",          id: "price",       placeholder: "e.g. 120",  type: "number" },
             { label: "description",    id: "description", placeholder: "Short description" },
             { label: "vendor ID",      id: "vendor_id",   placeholder: "e.g. 1" },
@@ -484,7 +482,6 @@ export default function App() {
       case "dashboard": return <DashboardPage />;
       case "products":  return <ProductsPage />;
 
-      // ✅ VENDORS - row click hone par setSelectedVendor call hoga → modal open
       case "vendors": return (
         <ApiPage
           title="Vendors" apiPath="/vendors"
@@ -743,13 +740,11 @@ export default function App() {
           </div>
         </div>
 
-        {/* PAGE CONTENT */}
         <div style={{ flex: 1, padding: 24, overflowY: "auto" }}>
           {renderPage()}
         </div>
       </div>
 
-      {/* ✅ VENDOR DETAIL MODAL - vendor row click hone par yahan show hoga */}
       {selectedVendor && (
         <VendorDetailModal
           vendors={selectedVendor}

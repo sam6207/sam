@@ -8,16 +8,16 @@ router.post("/", (req, res) => {
         const name = req.body.name || "";
         const description = req.body.description || "";
         const price = req.body.price !== undefined ? req.body.price : 0;
-        const stock = req.body.stock || 0;
+        const quantity = req.body.quantity || 0;
         const status = req.body.status || "active";
         const created_at = new Date().toISOString();
         const vendor_id = req.body.vendor_id || null;
         const category = req.body.category || "";
 
         db.prepare(`
-            INSERT INTO products (name, description, price, stock, status, created_at, vendor_id, category)
+            INSERT INTO products (name, description, price, quantity, status, created_at, vendor_id, category)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `).run(name, description, Number(price), Number(stock), status, created_at, vendor_id, category);
+        `).run(name, description, Number(price), Number(quantity), status, created_at, vendor_id, category);
 
         res.json({ message: "Product added" });
     } catch (err) {
@@ -52,13 +52,13 @@ router.put("/:id", (req, res) => {
         const name = req.body.name || "";
         const description = req.body.description || "";
         const price = req.body.price !== undefined ? req.body.price : 0;
-        const stock = req.body.stock || 0;
+        const quantity = req.body.quantity || 0;
         const status = req.body.status || "active";
         db.prepare(`
             UPDATE products
-            SET name = ?, description = ?, price = ?, stock = ?, status = ?
+            SET name = ?, description = ?, price = ?, quantity = ?, status = ?
             WHERE id = ?
-        `).run(name, description, Number(price), Number(stock), status, id);
+        `).run(name, description, Number(price), Number(quantity), status, id);
 
         res.json({ message: "Product updated" });
     } catch (err) {
