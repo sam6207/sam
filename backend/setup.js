@@ -20,7 +20,7 @@ console.log('✅ Vendors table');
 
 // 2. CUSTOMERS TABLE
 db.exec(`
-  CREATE TABLE IF NOT EXISTS customers (
+  CREATE TABLE IF NOT EXISTS customers (cd
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     phone TEXT,

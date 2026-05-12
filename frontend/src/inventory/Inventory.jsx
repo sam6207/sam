@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import SalesLineChart from "./SalesLineChart";
-import VendorDetailModal from "./VendorsDetails"; // ✅ IMPORT
+import VendorDetailModal from "./VendorsDetails";  
 import {
   LayoutDashboard, Package, Users, ShoppingCart, Tag,
   Store, UserCircle, Bell, Search,
