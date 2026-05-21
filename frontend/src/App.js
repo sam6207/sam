@@ -4,7 +4,6 @@ import Signup from "./pages/Signup";
 import InventoryApp from "./inventory/Inventory";
 import VendorsDetails from "./inventory/VendorsDetails";
 
-
 export default function MainApp() {
   return (
     <BrowserRouter>
@@ -14,6 +13,7 @@ export default function MainApp() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<InventoryApp />} />
         <Route path="/vendor/:id" element={<VendorsDetails/>}/>
+        
       </Routes>
     </BrowserRouter>
   );

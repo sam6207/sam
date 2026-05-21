@@ -10,10 +10,11 @@ router.post("/", (req, res) => {
       return res.status(400).json({ error: "customer_id, product_id, quantity required" });
 
     const customer = db.prepare("SELECT id FROM customers WHERE id = ?").get(Number(customer_id));
-    if (!customer) return res.status(400).json({ error: `Customer ID ${customer_id} exist nahi karta` });
+    if (!customer) return res.status(400).json({ error: `Customer ID ${customer_id} customer is not found` });
 
     const product = db.prepare("SELECT id FROM products WHERE id = ?").get(Number(product_id));
-    if (!product) return res.status(400).json({ error: `Product ID ${product_id} exist nahi karta` });
+    if (!product) return res.status(400).json({ error: `Product ID ${product_id} does not exist` });
+
 
     db.prepare(`
       INSERT INTO sales (customer_id, product_id, quantity, price, sale_date, total_amount, GST)

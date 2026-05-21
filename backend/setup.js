@@ -20,7 +20,7 @@ console.log('✅ Vendors table');
 
 // 2. CUSTOMERS TABLE
 db.exec(`
-  CREATE TABLE IF NOT EXISTS customers (cd
+  CREATE TABLE IF NOT EXISTS customers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     phone TEXT,
@@ -112,6 +112,7 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )
 `);
+
 console.log('✅ Users table');
 
 console.log('✅ All tables ready!');
